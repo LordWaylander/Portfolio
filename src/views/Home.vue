@@ -10,7 +10,6 @@
         <h2>Développeur Web - Full Stack</h2>
       </div>
 
-      
       <RouterLink to="/presentation" class="activeClass">
         <button>Me Découvrir</button>
       </RouterLink>
@@ -18,8 +17,8 @@
   </main>
 </template>
 <script setup>
-import { RouterLink } from 'vue-router'
-import GameLife from '../components/GameLife.vue'
+import { RouterLink } from "vue-router";
+import GameLife from "../components/GameLife.vue";
 </script>
 <style lang="scss" scoped>
 .menu {
@@ -47,7 +46,7 @@ import GameLife from '../components/GameLife.vue'
     margin-top: 4em;
     margin-bottom: -4em;
     width: 25%;
-    
+
     button {
       background-color: var(--grey-light);
       box-shadow:

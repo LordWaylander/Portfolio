@@ -33,153 +33,158 @@ export default {
       nbCol: 150,
       nbGeneration: 0,
       nIntervId: null,
-      tableJeu: {}
-    }
+      tableJeu: {},
+    };
   },
   mounted() {
-    this.setTable()
-    this.start()
+    this.setTable();
+    this.start();
   },
   beforeUnmount() {
-    this.pause()
-    this.nbGeneration = 0
+    this.pause();
+    this.nbGeneration = 0;
   },
   methods: {
     pause() {
-      clearInterval(this.nIntervId)
-      this.nIntervId = null
+      clearInterval(this.nIntervId);
+      this.nIntervId = null;
     },
     start() {
       if (!this.nIntervId) {
-        this.nIntervId = setInterval(this.play, 400)
+        this.nIntervId = setInterval(this.play, 400);
       }
     },
     restart() {
-      this.nbGeneration = 0
-      this.pause()
-      this.setTable()
-      this.start()
+      this.nbGeneration = 0;
+      this.pause();
+      this.setTable();
+      this.start();
     },
     setTable() {
-      let tableau = ''
-      let tbody = document.querySelector('tbody')
+      let tableau = "";
+      let tbody = document.querySelector("tbody");
 
-      this.tableJeu.etat = new Array(this.nbRow)
-      this.tableJeu.nbVoisins = new Array(this.nbRow)
+      this.tableJeu.etat = new Array(this.nbRow);
+      this.tableJeu.nbVoisins = new Array(this.nbRow);
 
       for (let i = 0; i < this.nbRow; i++) {
-        tableau += '<tr>'
-        this.tableJeu.etat[i] = new Array(this.nbCol)
-        this.tableJeu.nbVoisins[i] = new Array(this.nbCol)
-        this.tableJeu.nbVoisins[i].fill(0)
+        tableau += "<tr>";
+        this.tableJeu.etat[i] = new Array(this.nbCol);
+        this.tableJeu.nbVoisins[i] = new Array(this.nbCol);
+        this.tableJeu.nbVoisins[i].fill(0);
         for (let j = 0; j < this.nbCol; j++) {
-          let couleur = Math.floor(Math.random() * 1.10)
+          let couleur = Math.floor(Math.random() * 1.1);
           tableau +=
             '<td class="' +
-            (couleur != 0 ? 'estvivante' : '') +
+            (couleur != 0 ? "estvivante" : "") +
             '"data-row="' +
             i +
             '"' +
             'data-col="' +
             j +
-            '"></td>'
+            '"></td>';
         }
-        tableau += '</tr>'
+        tableau += "</tr>";
       }
-      tbody.innerHTML = tableau
+      tbody.innerHTML = tableau;
 
-      let cellules = document.getElementsByTagName('td')
+      let cellules = document.getElementsByTagName("td");
       for (let i = 0; i < cellules.length; i++) {
-        this.tableJeu.etat[cellules[i].dataset.row][cellules[i].dataset.col] = cellules[i]
+        this.tableJeu.etat[cellules[i].dataset.row][cellules[i].dataset.col] =
+          cellules[i];
       }
     },
     play() {
-    var ts1 = performance.now();
+      var ts1 = performance.now();
 
-      let cellulesVivantes = table.getElementsByClassName('estvivante')
+      let cellulesVivantes = table.getElementsByClassName("estvivante");
       for (let i = 0; i < cellulesVivantes.length; i++) {
-        
         let voisinsCellulesVivantes = this.getVoisins(
           parseInt(cellulesVivantes[i].dataset.row),
-          parseInt(cellulesVivantes[i].dataset.col)
-        )
-        ;
+          parseInt(cellulesVivantes[i].dataset.col),
+        );
         for (let j = 0; j < voisinsCellulesVivantes.length; j++) {
           this.tableJeu.nbVoisins[voisinsCellulesVivantes[j].dataset.row][
             voisinsCellulesVivantes[j].dataset.col
-          ]++
+          ]++;
         }
       }
-      let cellulesAlive = this.checkCellules()
+      let cellulesAlive = this.checkCellules();
 
       // reset le tableau à 0
       for (let i = 0; i < this.tableJeu.nbVoisins.length; i++) {
-        this.tableJeu.nbVoisins[i].fill(0)
+        this.tableJeu.nbVoisins[i].fill(0);
       }
-    
-    this.updateFront(cellulesAlive)
-    var ts2 = performance.now();
-    console.log('play : '+(ts2-ts1));
+
+      this.updateFront(cellulesAlive);
+      var ts2 = performance.now();
+      console.log("play : " + (ts2 - ts1));
     },
     getVoisins(row, col) {
-      let voisins = []
+      let voisins = [];
 
       // Traitement de la ligne précédente
       if (row - 1 >= 0) {
         if (col - 1 >= 0) {
-          voisins.push(this.tableJeu.etat[row - 1][col - 1])
+          voisins.push(this.tableJeu.etat[row - 1][col - 1]);
         }
         if (col + 1 < this.nbCol) {
-          voisins.push(this.tableJeu.etat[row - 1][col + 1])
+          voisins.push(this.tableJeu.etat[row - 1][col + 1]);
         }
-        voisins.push(this.tableJeu.etat[row - 1][col])
+        voisins.push(this.tableJeu.etat[row - 1][col]);
       }
       // Traitement de la ligne en cours
       if (col - 1 >= 0) {
-        voisins.push(this.tableJeu.etat[row][col - 1])
+        voisins.push(this.tableJeu.etat[row][col - 1]);
       }
       if (col + 1 < this.nbCol) {
-        voisins.push(this.tableJeu.etat[row][col + 1])
+        voisins.push(this.tableJeu.etat[row][col + 1]);
       }
       // Traitement de la ligne suivante
       if (row + 1 < this.nbRow) {
         if (col - 1 >= 0) {
-          voisins.push(this.tableJeu.etat[row + 1][col - 1])
+          voisins.push(this.tableJeu.etat[row + 1][col - 1]);
         }
         if (col + 1 < this.nbCol) {
-          voisins.push(this.tableJeu.etat[row + 1][col + 1])
+          voisins.push(this.tableJeu.etat[row + 1][col + 1]);
         }
-        voisins.push(this.tableJeu.etat[row + 1][col])
+        voisins.push(this.tableJeu.etat[row + 1][col]);
       }
-      return voisins
+      return voisins;
     },
     checkCellules() {
-      let cellulesAlive = []
+      let cellulesAlive = [];
 
       for (let i = 0; i < this.tableJeu.etat.length; i++) {
         for (let j = 0; j < this.tableJeu.etat[i].length; j++) {
           //verif si case noire
-          let celluleNoire = this.tableJeu.etat[i][j].classList.contains('estvivante')
+          let celluleNoire =
+            this.tableJeu.etat[i][j].classList.contains("estvivante");
 
-          if ((!celluleNoire && this.tableJeu.nbVoisins[i][j] == 3) ||(celluleNoire &&(this.tableJeu.nbVoisins[i][j] == 2 || this.tableJeu.nbVoisins[i][j] == 3))) {
-            cellulesAlive.push(this.tableJeu.etat[i][j])
+          if (
+            (!celluleNoire && this.tableJeu.nbVoisins[i][j] == 3) ||
+            (celluleNoire &&
+              (this.tableJeu.nbVoisins[i][j] == 2 ||
+                this.tableJeu.nbVoisins[i][j] == 3))
+          ) {
+            cellulesAlive.push(this.tableJeu.etat[i][j]);
           }
         }
       }
-      return cellulesAlive
+      return cellulesAlive;
     },
     updateFront(cellulesAlive) {
-      let cellules = table.querySelectorAll('.estvivante')
+      let cellules = table.querySelectorAll(".estvivante");
       for (let i = 0; i < cellules.length; i++) {
-        cellules[i].classList.remove('estvivante')
+        cellules[i].classList.remove("estvivante");
       }
       for (let i = 0; i < cellulesAlive.length; i++) {
-        cellulesAlive[i].classList.add('estvivante')
+        cellulesAlive[i].classList.add("estvivante");
       }
-      this.nbGeneration++
-    }
-  }
-}
+      this.nbGeneration++;
+    },
+  },
+};
 </script>
 <style lang="scss">
 #table {
@@ -213,7 +218,7 @@ export default {
 }
 #dataTable td {
   background-color: var(--color-background);
-  width:1px;
+  width: 1px;
   height: 1px;
 }
 
