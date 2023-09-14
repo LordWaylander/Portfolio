@@ -33,7 +33,7 @@ export default {
       maxCol: 0,
       maxRow: 0,
       maxCell: 0,
-      cellSizeInEm: 10,
+      cellSizeInPx: 10,
       gameBoard: Array,
       nextBoard: Array,
       board: Object,
@@ -52,7 +52,6 @@ export default {
       ],
     };
   },
-  created() {},
   mounted() {
     this.initialize();
     this.play();
@@ -68,6 +67,16 @@ export default {
       this.buildGameBoardTable();
       
     },
+    reset() {
+      this.maxCol = Math.floor(window.innerWidth / this.cellSizeInPx);
+      this.maxRow = Math.floor(window.innerHeight / this.cellSizeInPx);
+      this.maxCell = this.maxRow * this.maxCol;
+      console.log("cellSizeInPx = ", this.cellSizeInPx);
+      console.log("maxCol = ", this.maxCol);
+      console.log("maxRow = ", this.maxRow);
+      console.log("maxCell = ", this.maxCell);
+      this.initRandomCells();
+    },
     initRandomCells() {
       this.gameBoard = Array.from({ length: this.maxCell }, () =>
         Math.round(Math.random()),
@@ -76,23 +85,12 @@ export default {
         0,
       );
     },
-    reset() {
-      this.maxCol = Math.floor(window.innerWidth / this.cellSizeInEm);
-      this.maxRow = Math.floor(window.innerHeight / this.cellSizeInEm);
-      this.maxCell = this.maxRow * this.maxCol;
-      console.log("cellSizeInEm = ", this.cellSizeInEm);
-      console.log("maxCol = ", this.maxCol);
-      console.log("maxRow = ", this.maxRow);
-      console.log("maxCell = ", this.maxCell);
-      this.initRandomCells();
-    },
     buildGameBoardTable() {
 
       this.board.textContent = "";
 
-      const createCol = (i,j) => {
-        const newCol = document.createElement("td");
-        return newCol;
+      const createCol = () => {
+        return document.createElement("td");
       };
 
       const createRow = () => {
@@ -102,7 +100,7 @@ export default {
       for (let j = 0; j < this.maxRow; j++) {
         const newRow = createRow();
         for (let i = 0; i < this.maxCol; i++) {
-          const newCol = createCol(i,j);
+          const newCol = createCol();
           this.cells.push(newCol);
           newRow.appendChild(newCol);
         }
@@ -110,9 +108,7 @@ export default {
       }
       this.update()
     },
-    
     update() {
-
       let currentPosX = 0;
       let currentPosY = 0;
 
@@ -126,10 +122,10 @@ export default {
             currentPosY,
         );
 
-        const itMustDie = isCurrentCellLive && (neighboursAlive < 2 || neighboursAlive > 3);
-        const itMustLive = (!isCurrentCellLive && neighboursAlive === 3) ||(isCurrentCellLive && (neighboursAlive === 2 || neighboursAlive === 3));
+        const mustDie = isCurrentCellLive && (neighboursAlive < 2 || neighboursAlive > 3);
+        const mustLive = (!isCurrentCellLive && neighboursAlive === 3) ||(isCurrentCellLive && (neighboursAlive === 2 || neighboursAlive === 3));
 
-        const newValue = itMustDie ? 0 : itMustLive ? 1 : 0;
+        const newValue = mustDie ? 0 : mustLive ? 1 : 0;
 
         if (currentValue !== newValue) {
           this.updateDisplayCell(cellPos, newValue);
@@ -149,14 +145,6 @@ export default {
       //this.gameBoard = structuredClone(this.nextBoard)
       this.gameBoard = this.nextBoard.slice(0)
     },
-    updateDisplayCell(cellPos, newValue) {
-      this.nextBoard[cellPos] = newValue;
-
-      this.cells[cellPos].setAttribute(
-        "data-cell-is-alive",
-        newValue.toString(),
-      );
-    },
     getAliveCellNeighboursAt(x, y) {
       const getCellState = ((x, y) => {
         if ((x >= 0 && x < this.maxCol) && (y >= 0 && y < this.maxRow)) {
@@ -171,6 +159,14 @@ export default {
       
       return count;
       
+    },
+    updateDisplayCell(cellPos, newValue) {
+      this.nextBoard[cellPos] = newValue;
+
+      this.cells[cellPos].setAttribute(
+        "data-cell-is-alive",
+        newValue.toString(),
+      );
     },
     pause() {
       this.clearIntervalId();
