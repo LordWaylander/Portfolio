@@ -38,7 +38,6 @@ export default {
       nextBoard: Array,
       board: Object,
       cells: [],
-      started: false,
       rafId: undefined,
       nIntervId: null,
       direction: [
@@ -59,7 +58,7 @@ export default {
     this.play();
   },
   beforeUnmount() {
-    this.clearnIntervId();
+    this.clearIntervalId();
     this.nbGeneration = 0;
   },
   methods: {
@@ -81,10 +80,10 @@ export default {
       this.maxCol = Math.floor(window.innerWidth / this.cellSizeInEm);
       this.maxRow = Math.floor(window.innerHeight / this.cellSizeInEm);
       this.maxCell = this.maxRow * this.maxCol;
-      //console.log("cellSizeInEm = ", this.cellSizeInEm);
-      //console.log("maxCol = ", this.maxCol);
-      //console.log("maxRow = ", this.maxRow);
-      //console.log("maxCell = ", this.maxCell);
+      console.log("cellSizeInEm = ", this.cellSizeInEm);
+      console.log("maxCol = ", this.maxCol);
+      console.log("maxRow = ", this.maxRow);
+      console.log("maxCell = ", this.maxCell);
       this.initRandomCells();
     },
     buildGameBoardTable() {
@@ -109,11 +108,11 @@ export default {
         }
         this.board.appendChild(newRow);
       }
+      this.update()
     },
     
     update() {
 
-      //let cellPos = 0;
       let currentPosX = 0;
       let currentPosY = 0;
 
@@ -149,13 +148,6 @@ export default {
       //this.gameBoard = Array().concat(this.nextBoard)
       //this.gameBoard = structuredClone(this.nextBoard)
       this.gameBoard = this.nextBoard.slice(0)
-      console.log(this.started);
-
-      if (!this.started) {
-        console.log('NOT START');
-        cancelAnimationFrame(this.rafId);
-        return;
-      }
     },
     updateDisplayCell(cellPos, newValue) {
       this.nextBoard[cellPos] = newValue;
@@ -180,33 +172,25 @@ export default {
       return count;
       
     },
-    start() {
-      
-      if (!this.nIntervId) {
-        this.nIntervId = setInterval(this.update(), 250);
-      }
-    
-    //this.play();
-    },
     pause() {
-      console.log("pause");
-      this.started = false;
+      this.clearIntervalId();
       cancelAnimationFrame(this.rafId);
-      this.reset();
     },
     restart() {
-        if (this.started) {
-            this.stop();
-        }
-            this.initialize();
+      this.nbGeneration = 0;
+      this.pause()
+      this.reset();
+      this.play()
     },
     play() {
-      console.log('PLAY');
-        this.started = true;
-        this.rafId = window.requestAnimationFrame(this.update.bind(this))
-
+      let self = this
+      if (!this.nIntervId) {
+        this.nIntervId = setInterval(function() {
+          self.rafId = window.requestAnimationFrame(self.update.bind(self))
+        }, 400);
+      }
     },
-    clearnIntervId() {
+    clearIntervalId() {
       clearInterval(this.nIntervId);
       this.nIntervId = null;
     },

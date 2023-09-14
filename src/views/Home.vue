@@ -1,6 +1,6 @@
 <template>
   <GameLife />
-  <!--<main class="main center">
+  <main class="main center">
     <div class="center menu">
       <div>
         <h1 class="title">Waylander</h1>
@@ -14,7 +14,7 @@
         <button>Me Découvrir</button>
       </RouterLink>
     </div>
-  </main> -->
+  </main>
 </template>
 <script setup>
 import { RouterLink } from "vue-router";
