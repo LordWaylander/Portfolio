@@ -20,7 +20,7 @@
 
     <div id="table">
       <table id="dataTable">
-        <tbody></tbody>
+        <tbody v-html="arrayHtml"></tbody>
       </table>
     </div>
   </div>
@@ -33,156 +33,187 @@ export default {
       nbCol: 150,
       nbGeneration: 0,
       nIntervId: null,
-      tableJeu: {},
+      tableJeu: new Object(),
+      arrayHtml: null,
+      dataTable: null,
     };
   },
+  created(){
+    this.setVariables()
+    this.setupTable()
+  },
   mounted() {
-    this.setTable();
-    this.start();
+    this.setEtat()
+    this.start()
   },
   beforeUnmount() {
-    this.pause();
+    this.clearnIntervId();
     this.nbGeneration = 0;
   },
   methods: {
-    pause() {
-      clearInterval(this.nIntervId);
-      this.nIntervId = null;
+    setVariables() {
+      const windowWidth = window.innerWidth
+
+      if(windowWidth > 810) {
+        this.nbRow = 200
+        this.nbCol = 200
+      } else if((windowWidth <= 810) && (windowWidth >  400)) {
+        this.nbRow = 150
+        this.nbCol = 150
+      }else {
+        this.nbRow = 100
+        this.nbCol = 100
+      }
+    },
+    setupTable() {
+      const ts1 = performance.now();
+
+      let tableau = '';
+
+      this.tableJeu.etat = new Array(this.nbRow);
+      this.tableJeu.nbVoisins = new Array();
+
+      for (let i = 0; i < this.nbRow; i++) {
+          tableau += '<tr>'
+            this.tableJeu.etat[i] = new Array(this.nbCol);
+            this.tableJeu.nbVoisins[i] = new Array(this.nbCol);
+            this.tableJeu.nbVoisins[i].fill(0);
+          for (let j = 0; j < this.nbCol; j++) {
+              let couleur = Math.floor(Math.random() * 1.1);
+              tableau+='<td class="' + (couleur != 0 ? 'estvivante':'') + '"data-row="'+i+'"'+ 'data-col="'+j+'"></td>'
+          }
+          tableau += '</tr>'
+      }
+      this.arrayHtml = tableau;
+
+      const ts2 = performance.now();
+      console.log('setupTable : '+(ts2-ts1));
+
+    },
+    setEtat(){
+
+      const ts1 = performance.now();
+      this.dataTable = document.getElementById('dataTable');
+      let cellules = document.getElementsByTagName('td');
+        for (let i = 0; i < cellules.length; i++) {
+          this.tableJeu.etat[cellules[i].dataset.row][cellules[i].dataset.col] = cellules[i];
+        }
+        const ts2 = performance.now();
+        console.log('setEtat : '+(ts2-ts1));
+    },
+    play() {
+      const ts1 = performance.now();
+      let cellulesVivantes = dataTable.getElementsByClassName('estvivante');
+      const ts3 = performance.now();
+
+      for (let i = 0; i < cellulesVivantes.length; i++) {
+
+          let voisinsCellulesVivantes = this.getVoisins(parseInt(cellulesVivantes[i].dataset.row), parseInt(cellulesVivantes[i].dataset.col));
+
+          for (let j = 0; j < voisinsCellulesVivantes.length; j++) {
+            this.tableJeu.nbVoisins[voisinsCellulesVivantes[j].dataset.row][voisinsCellulesVivantes[j].dataset.col]++
+          }
+      }
+      const ts4 = performance.now();
+      console.log('getVoisinsTotal : '+(ts4-ts3));
+
+      let cellulesAlive = this.checkCellules();
+
+      // reset le tableau à 0
+      for (let i = 0; i < this.tableJeu.nbVoisins.length; i++) {
+          this.tableJeu.nbVoisins[i].fill(0);
+      }
+      this.updateFront(cellulesAlive);
+
+      const ts2 = performance.now();
+      console.log('play (total) : '+(ts2-ts1));
+    },
+    getVoisins(row, col){
+      let voisins = [];
+
+      // Traitement de la ligne précédente
+      if (row - 1 >= 0) {
+          if (col - 1 >= 0) {
+              voisins.push(this.tableJeu.etat[row - 1][col - 1]);
+          }
+          if (col + 1 < this.nbCol) {
+              voisins.push(this.tableJeu.etat[row - 1][col + 1]);
+          }
+          voisins.push(this.tableJeu.etat[row - 1][col]);
+      }
+      // Traitement de la ligne en cours
+      if (col - 1 >= 0) {
+          voisins.push(this.tableJeu.etat[row][col - 1]);
+      }
+      if (col + 1 < this.nbCol) {
+          voisins.push(this.tableJeu.etat[row][col + 1]);
+      }
+      // Traitement de la ligne suivante
+      if (row + 1 < this.nbRow) {
+          if (col - 1 >= 0) {
+              voisins.push(this.tableJeu.etat[row + 1][col - 1]);
+          }
+          if (col + 1 < this.nbCol) {;
+              voisins.push(this.tableJeu.etat[row + 1][col + 1]);
+          }
+          voisins.push(this.tableJeu.etat[row + 1][col]);
+      }
+      return voisins;
+    },
+    checkCellules(){
+      const ts1 = performance.now();
+
+      let cellulesAlive = [];
+
+      for (let i = 0; i < this.tableJeu.etat.length; i++) {
+          for (let j = 0; j < this.tableJeu.etat[i].length; j++) {
+              //verif si case noire
+              let celluleNoire = this.tableJeu.etat[i][j].classList.contains('estvivante');
+
+              if ((!celluleNoire && this.tableJeu.nbVoisins[i][j]==3) || (celluleNoire && (this.tableJeu.nbVoisins[i][j]==2 || this.tableJeu.nbVoisins[i][j]==3))) {
+                  cellulesAlive.push(this.tableJeu.etat[i][j]);
+              }
+          }
+      }
+
+      const ts2 = performance.now();
+      console.log('checkCellules : '+(ts2-ts1));
+      return cellulesAlive;
+    },
+    updateFront(cellulesAlive){
+      const ts1 = performance.now();
+      let cellules = this.dataTable.querySelectorAll('.estvivante');
+      for (let i = 0; i < cellules.length; i++) {
+          cellules[i].classList.remove('estvivante');
+      }
+      for (let i = 0; i < cellulesAlive.length; i++) {
+          cellulesAlive[i].classList.add('estvivante');
+      }
+      this.nbGeneration++;
+
+      const ts2 = performance.now();
+      console.log('updateFront : '+(ts2-ts1));
     },
     start() {
       if (!this.nIntervId) {
         this.nIntervId = setInterval(this.play, 400);
       }
+      
+      //this.play();
+    },
+    pause(){
+      this.clearnIntervId()
     },
     restart() {
+      this.clearnIntervId()
       this.nbGeneration = 0;
-      this.pause();
-      this.setTable();
-      this.start();
+      this.setupTable();
     },
-    setTable() {
-      let tableau = "";
-      let tbody = document.querySelector("tbody");
-
-      this.tableJeu.etat = new Array(this.nbRow);
-      this.tableJeu.nbVoisins = new Array(this.nbRow);
-
-      for (let i = 0; i < this.nbRow; i++) {
-        tableau += "<tr>";
-        this.tableJeu.etat[i] = new Array(this.nbCol);
-        this.tableJeu.nbVoisins[i] = new Array(this.nbCol);
-        this.tableJeu.nbVoisins[i].fill(0);
-        for (let j = 0; j < this.nbCol; j++) {
-          let couleur = Math.floor(Math.random() * 1.1);
-          tableau +=
-            '<td class="' +
-            (couleur != 0 ? "estvivante" : "") +
-            '"data-row="' +
-            i +
-            '"' +
-            'data-col="' +
-            j +
-            '"></td>';
-        }
-        tableau += "</tr>";
-      }
-      tbody.innerHTML = tableau;
-
-      let cellules = document.getElementsByTagName("td");
-      for (let i = 0; i < cellules.length; i++) {
-        this.tableJeu.etat[cellules[i].dataset.row][cellules[i].dataset.col] =
-          cellules[i];
-      }
+    clearnIntervId(){
+      clearInterval(this.nIntervId);
+      this.nIntervId = null;
     },
-    play() {
-      var ts1 = performance.now();
 
-      let cellulesVivantes = table.getElementsByClassName("estvivante");
-      for (let i = 0; i < cellulesVivantes.length; i++) {
-        let voisinsCellulesVivantes = this.getVoisins(
-          parseInt(cellulesVivantes[i].dataset.row),
-          parseInt(cellulesVivantes[i].dataset.col),
-        );
-        for (let j = 0; j < voisinsCellulesVivantes.length; j++) {
-          this.tableJeu.nbVoisins[voisinsCellulesVivantes[j].dataset.row][
-            voisinsCellulesVivantes[j].dataset.col
-          ]++;
-        }
-      }
-      let cellulesAlive = this.checkCellules();
-
-      // reset le tableau à 0
-      for (let i = 0; i < this.tableJeu.nbVoisins.length; i++) {
-        this.tableJeu.nbVoisins[i].fill(0);
-      }
-
-      this.updateFront(cellulesAlive);
-      var ts2 = performance.now();
-      console.log("play : " + (ts2 - ts1));
-    },
-    getVoisins(row, col) {
-      let voisins = [];
-
-      // Traitement de la ligne précédente
-      if (row - 1 >= 0) {
-        if (col - 1 >= 0) {
-          voisins.push(this.tableJeu.etat[row - 1][col - 1]);
-        }
-        if (col + 1 < this.nbCol) {
-          voisins.push(this.tableJeu.etat[row - 1][col + 1]);
-        }
-        voisins.push(this.tableJeu.etat[row - 1][col]);
-      }
-      // Traitement de la ligne en cours
-      if (col - 1 >= 0) {
-        voisins.push(this.tableJeu.etat[row][col - 1]);
-      }
-      if (col + 1 < this.nbCol) {
-        voisins.push(this.tableJeu.etat[row][col + 1]);
-      }
-      // Traitement de la ligne suivante
-      if (row + 1 < this.nbRow) {
-        if (col - 1 >= 0) {
-          voisins.push(this.tableJeu.etat[row + 1][col - 1]);
-        }
-        if (col + 1 < this.nbCol) {
-          voisins.push(this.tableJeu.etat[row + 1][col + 1]);
-        }
-        voisins.push(this.tableJeu.etat[row + 1][col]);
-      }
-      return voisins;
-    },
-    checkCellules() {
-      let cellulesAlive = [];
-
-      for (let i = 0; i < this.tableJeu.etat.length; i++) {
-        for (let j = 0; j < this.tableJeu.etat[i].length; j++) {
-          //verif si case noire
-          let celluleNoire =
-            this.tableJeu.etat[i][j].classList.contains("estvivante");
-
-          if (
-            (!celluleNoire && this.tableJeu.nbVoisins[i][j] == 3) ||
-            (celluleNoire &&
-              (this.tableJeu.nbVoisins[i][j] == 2 ||
-                this.tableJeu.nbVoisins[i][j] == 3))
-          ) {
-            cellulesAlive.push(this.tableJeu.etat[i][j]);
-          }
-        }
-      }
-      return cellulesAlive;
-    },
-    updateFront(cellulesAlive) {
-      let cellules = table.querySelectorAll(".estvivante");
-      for (let i = 0; i < cellules.length; i++) {
-        cellules[i].classList.remove("estvivante");
-      }
-      for (let i = 0; i < cellulesAlive.length; i++) {
-        cellulesAlive[i].classList.add("estvivante");
-      }
-      this.nbGeneration++;
-    },
   },
 };
 </script>
@@ -243,5 +274,13 @@ export default {
 #restart img {
   width: 25px;
   height: 25px;
+}
+#divGen {
+  width: 25%;
+}
+#generation {
+  width: inherit;
+  border: none;
+  color: black;
 }
 </style>

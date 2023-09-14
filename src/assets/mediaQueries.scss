@@ -1,0 +1,42 @@
+@media (max-width: 1120px) {
+    .subTitle, .title {
+      text-align: center;
+    }
+    .linkDiscoverMe{
+      top: 20% !important;
+    }
+  
+  }
+  @media (max-width: 620px) {
+    .title {
+      font-size: 4em !important;
+    }
+    .subTitle {
+      font-size: 3em !important;
+    }
+    .linkDiscoverMe {
+      button {
+        font-size: 1em !important;
+      }
+    }
+  }
+  @media (max-width: 445px) {
+    .title {
+      font-size: 3em !important;
+    }
+    .subTitle {
+      font-size: 2em !important;
+    }
+    .linkDiscoverMe {
+      top: 12% !important;
+      button {
+        padding: 1em 0em 1em 0em !important;
+      }
+    }
+  }
+  
+  @media (max-width: 390px) {
+   .linkDiscoverMe {
+    width: 50% !important;
+   }
+  }

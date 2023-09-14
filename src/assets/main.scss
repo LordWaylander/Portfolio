@@ -1,14 +1,16 @@
 @import "./base.scss";
+@import "./mediaQueries.scss";
 
 @font-face {
   font-family: UKIJRu;
   src: local("/fonts/UKIJRu.ttf");
   src: url("/fonts/UKIJRu.ttf");
 }
+
 @font-face {
-  font-family: UKIJMoyQ;
-  src: local("/fonts/UKIJMoyQ.ttf");
-  src: url("/fonts/UKIJMoyQ.ttf");
+  font-family: unifont;
+  src: local("/fonts/unifont.otf");
+  src: url("/fonts/unifont.otf");
 }
 
 .center {
@@ -18,8 +20,4 @@
 }
 .main {
   min-height: 100vh;
-}
-
-.menu {
-  background-color: var(--color-background-soft);
 }

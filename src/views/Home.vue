@@ -3,14 +3,14 @@
   <main class="main center">
     <div class="center menu">
       <div>
-        <h1>Waylander</h1>
+        <h1 class="title">Waylander</h1>
       </div>
       <span></span>
       <div>
-        <h2>Développeur Web - Full Stack</h2>
+        <h2 class="subTitle">Développeur Web - Full Stack</h2>
       </div>
 
-      <RouterLink to="/presentation" class="activeClass">
+      <RouterLink to="/presentation" class="activeClass linkDiscoverMe">
         <button>Me Découvrir</button>
       </RouterLink>
     </div>
@@ -22,6 +22,7 @@ import GameLife from "../components/GameLife.vue";
 </script>
 <style lang="scss" scoped>
 .menu {
+  background-color: var(--color-background-soft);
   width: 75vw;
   height: 50vh;
   flex-direction: column;
@@ -32,8 +33,8 @@ import GameLife from "../components/GameLife.vue";
     font-size: 5em;
   }
   h2 {
-    font-family: UKIJMoyQ;
-    font-size: 5em;
+    font-family: unifont;
+    font-size: 4em;
   }
   span {
     height: 10px;
@@ -43,9 +44,9 @@ import GameLife from "../components/GameLife.vue";
     border-radius: 2em;
   }
   a {
-    margin-top: 4em;
-    margin-bottom: -4em;
     width: 25%;
+    position: relative;
+    top: 10%;
 
     button {
       background-color: var(--grey-light);
@@ -61,12 +62,6 @@ import GameLife from "../components/GameLife.vue";
       text-decoration: none;
       cursor: pointer;
     }
-  }
-}
-@media (max-width: 910px) {
-  h1,
-  h2 {
-    text-align: center;
   }
 }
 </style>
