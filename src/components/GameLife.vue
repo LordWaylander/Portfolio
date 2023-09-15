@@ -6,7 +6,7 @@
         <input id="generation" type="text" disabled v-model="nbGeneration" />
       </div>
       <div id="buttons">
-        <button type="button" name="button" id="start" @click="play()">
+        <button type="button" name="button" id="start" @click="start()">
           <img src="/img/play-solid.png" alt="" />
         </button>
         <button type="button" name="button" id="pause" @click="pause()">
@@ -18,9 +18,9 @@
       </div>
     </div>
 
-    <div id="gameboard" @click="tt($event)">
+    <div id="gameboard">
       <table id="gameBoard_table">
-        <tbody></tbody>
+        <tbody v-html="arrayHtml"></tbody>
       </table>
     </div>
   </div>
@@ -29,164 +29,179 @@
 export default {
   data() {
     return {
+      nbRow: 151,
+      nbCol: 91,
       nbGeneration: 0,
-      maxCol: 0,
-      maxRow: 0,
-      maxCell: 0,
-      cellSizeInPx: 10,
-      gameBoard: Array,
-      nextBoard: Array,
-      board: Object,
-      cells: [],
-      rafId: undefined,
       nIntervId: null,
-      direction: [
-        { x: -1, y: -1 },
-        { x: 0, y: -1 },
-        { x: 1, y: -1 },
-        { x: -1, y: 0 },
-        { x: 1, y: 0 },
-        { x: -1, y: 1 },
-        { x: 0, y: 1 },
-        { x: 1, y: 1 },
-      ],
+      tableJeu: new Object(),
+      arrayHtml: null,
+      dataTable: null,
+      cellSizeInPx: 10,
     };
   },
+  created() {
+    this.setVariables();
+    this.setupTable();
+  },
   mounted() {
-    this.initialize();
-    this.play();
+    this.setEtat();
+    this.start();
   },
   beforeUnmount() {
-    this.clearIntervalId();
+    this.clearnIntervId();
     this.nbGeneration = 0;
   },
   methods: {
-    initialize() {
-      this.board = document.getElementById("gameBoard_table");
-      this.reset();
-      this.buildGameBoardTable();
-      
-    },
-    reset() {
-      this.maxCol = Math.floor(window.innerWidth / this.cellSizeInPx);
-      this.maxRow = Math.floor(window.innerHeight / this.cellSizeInPx);
-      this.maxCell = this.maxRow * this.maxCol;
+    setVariables() {
+      this.nbCol = Math.floor(window.innerWidth / this.cellSizeInPx);
+      this.nbRow = Math.floor(window.innerHeight / this.cellSizeInPx);
       console.log("cellSizeInPx = ", this.cellSizeInPx);
-      console.log("maxCol = ", this.maxCol);
-      console.log("maxRow = ", this.maxRow);
-      console.log("maxCell = ", this.maxCell);
-      this.initRandomCells();
+      console.log("maxCol = ", this.nbCol);
+      console.log("maxRow = ", this.nbRow);
     },
-    initRandomCells() {
-      this.gameBoard = Array.from({ length: this.maxCell }, () =>
-        Math.round(Math.random()),
-      );
-      this.nextBoard = Array.from({ length: this.maxCell }, () =>
-        0,
-      );
-    },
-    buildGameBoardTable() {
+    setupTable() {
 
-      this.board.textContent = "";
+      let tableau = "";
 
-      const createCol = () => {
-        return document.createElement("td");
-      };
+      this.tableJeu.etat = new Array(this.nbRow);
+      this.tableJeu.nbVoisins = new Array();
 
-      const createRow = () => {
-        return document.createElement("tr");
-      };
-
-      for (let j = 0; j < this.maxRow; j++) {
-        const newRow = createRow();
-        for (let i = 0; i < this.maxCol; i++) {
-          const newCol = createCol();
-          this.cells.push(newCol);
-          newRow.appendChild(newCol);
+      for (let i = 0; i < this.nbRow; i++) {
+        tableau += "<tr>";
+        this.tableJeu.etat[i] = new Array(this.nbCol);
+        this.tableJeu.nbVoisins[i] = new Array(this.nbCol);
+        this.tableJeu.nbVoisins[i].fill(0);
+        for (let j = 0; j < this.nbCol; j++) {
+          let couleur = Math.floor(Math.random() * 1.1);
+          tableau +=
+            '<td class="' +
+            (couleur != 0 ? "estvivante" : "") +
+            '"data-row="' +
+            i +
+            '"' +
+            'data-col="' +
+            j +
+            '"></td>';
         }
-        this.board.appendChild(newRow);
+        tableau += "</tr>";
       }
-      this.update()
+      this.arrayHtml = tableau;
     },
-    update() {
-      let currentPosX = 0;
-      let currentPosY = 0;
-
-      for (let cellPos = 0; cellPos < this.maxCell; cellPos++) {
-        
-        const currentValue = this.gameBoard[cellPos];
-        const isCurrentCellLive = currentValue === 1;
-
-        const neighboursAlive = this.getAliveCellNeighboursAt(
-            currentPosX,
-            currentPosY,
-        );
-
-        const mustDie = isCurrentCellLive && (neighboursAlive < 2 || neighboursAlive > 3);
-        const mustLive = (!isCurrentCellLive && neighboursAlive === 3) ||(isCurrentCellLive && (neighboursAlive === 2 || neighboursAlive === 3));
-
-        const newValue = mustDie ? 0 : mustLive ? 1 : 0;
-
-        if (currentValue !== newValue) {
-          this.updateDisplayCell(cellPos, newValue);
-        }
-
-        currentPosX++;
-        if (currentPosX === this.maxCol) {
-          currentPosX = 0;
-          currentPosY++;
-        }
+    setEtat() {
+      
+      this.dataTable = document.getElementById("gameBoard_table");
+      let cellules = document.getElementsByTagName("td");
+      for (let i = 0; i < cellules.length; i++) {
+        this.tableJeu.etat[cellules[i].dataset.row][cellules[i].dataset.col] =
+          cellules[i];
       }
-
-      this.nbGeneration++;
-
-      //this.gameBoard = [...this.nextBoard]
-      //this.gameBoard = Array().concat(this.nextBoard)
-      //this.gameBoard = structuredClone(this.nextBoard)
-      this.gameBoard = this.nextBoard.slice(0)
-    },
-    getAliveCellNeighboursAt(x, y) {
-      const getCellState = ((x, y) => {
-        if ((x >= 0 && x < this.maxCol) && (y >= 0 && y < this.maxRow)) {
-          return this.gameBoard[x + y * this.maxCol]
-        }
-        return 0;
-      })
-
-      const count = getCellState(x+1 , y) + getCellState(x-1 , y) + 
-                    getCellState(x+1 , y-1) + getCellState(x-1 , y-1) + getCellState(x , y-1) +
-                    getCellState(x+1 , y+1) + getCellState(x-1 , y+1) + getCellState(x , y+1)
-      
-      return count;
-      
-    },
-    updateDisplayCell(cellPos, newValue) {
-      this.nextBoard[cellPos] = newValue;
-
-      this.cells[cellPos].setAttribute(
-        "data-cell-is-alive",
-        newValue.toString(),
-      );
-    },
-    pause() {
-      this.clearIntervalId();
-      cancelAnimationFrame(this.rafId);
-    },
-    restart() {
-      this.nbGeneration = 0;
-      this.pause()
-      this.reset();
-      this.play()
     },
     play() {
-      let self = this
+      let cellulesVivantes =
+        this.dataTable.getElementsByClassName("estvivante");
+
+      for (let i = 0; i < cellulesVivantes.length; i++) {
+        let voisinsCellulesVivantes = this.getVoisins(
+          parseInt(cellulesVivantes[i].dataset.row),
+          parseInt(cellulesVivantes[i].dataset.col),
+        );
+
+        for (let j = 0; j < voisinsCellulesVivantes.length; j++) {
+          this.tableJeu.nbVoisins[voisinsCellulesVivantes[j].dataset.row][
+            voisinsCellulesVivantes[j].dataset.col
+          ]++;
+        }
+      }
+
+      let cellulesAlive = this.checkCellules();
+
+      // reset le tableau à 0
+      for (let i = 0; i < this.tableJeu.nbVoisins.length; i++) {
+        this.tableJeu.nbVoisins[i].fill(0);
+      }
+      this.updateFront(cellulesAlive);
+    },
+    getVoisins(row, col) {
+      let voisins = [];
+
+      // Traitement de la ligne précédente
+      if (row - 1 >= 0) {
+        if (col - 1 >= 0) {
+          voisins.push(this.tableJeu.etat[row - 1][col - 1]);
+        }
+        if (col + 1 < this.nbCol) {
+          voisins.push(this.tableJeu.etat[row - 1][col + 1]);
+        }
+        voisins.push(this.tableJeu.etat[row - 1][col]);
+      }
+      // Traitement de la ligne en cours
+      if (col - 1 >= 0) {
+        voisins.push(this.tableJeu.etat[row][col - 1]);
+      }
+      if (col + 1 < this.nbCol) {
+        voisins.push(this.tableJeu.etat[row][col + 1]);
+      }
+      // Traitement de la ligne suivante
+      if (row + 1 < this.nbRow) {
+        if (col - 1 >= 0) {
+          voisins.push(this.tableJeu.etat[row + 1][col - 1]);
+        }
+        if (col + 1 < this.nbCol) {
+          voisins.push(this.tableJeu.etat[row + 1][col + 1]);
+        }
+        voisins.push(this.tableJeu.etat[row + 1][col]);
+      }
+      return voisins;
+    },
+    checkCellules() {
+
+      let cellulesAlive = [];
+
+      for (let i = 0; i < this.tableJeu.etat.length; i++) {
+        for (let j = 0; j < this.tableJeu.etat[i].length; j++) {
+          //verif si case noire
+          let celluleNoire =
+            this.tableJeu.etat[i][j].classList.contains("estvivante");
+
+          if (
+            (!celluleNoire && this.tableJeu.nbVoisins[i][j] == 3) ||
+            (celluleNoire &&
+              (this.tableJeu.nbVoisins[i][j] == 2 ||
+                this.tableJeu.nbVoisins[i][j] == 3))
+          ) {
+            cellulesAlive.push(this.tableJeu.etat[i][j]);
+          }
+        }
+      }
+
+      return cellulesAlive;
+    },
+    updateFront(cellulesAlive) {
+      let cellules = this.dataTable.querySelectorAll(".estvivante");
+      for (let i = 0; i < cellules.length; i++) {
+        cellules[i].classList.remove("estvivante");
+      }
+      for (let i = 0; i < cellulesAlive.length; i++) {
+        cellulesAlive[i].classList.add("estvivante");
+      }
+      this.nbGeneration++;
+    },
+    start() {
       if (!this.nIntervId) {
-        this.nIntervId = setInterval(function() {
-          self.rafId = window.requestAnimationFrame(self.update.bind(self))
-        }, 400);
+        this.nIntervId = setInterval(this.play, 400);
       }
     },
-    clearIntervalId() {
+    pause() {
+      this.clearnIntervId();
+    },
+    restart() {
+      this.clearnIntervId();
+      this.nbGeneration = 0;
+      //this.setVariables();
+      this.setupTable();
+      this.setEtat();
+    },
+    clearnIntervId() {
       clearInterval(this.nIntervId);
       this.nIntervId = null;
     },
@@ -235,16 +250,12 @@ export default {
       width: 10px;
       height: 10px;
     }
-    td[data-cell-is-alive="1"] {
-        background-color: #b9bec6;
-    }
-    td[data-cell-is-alive="0"] {
-        background-color: var(--color-background);
-    }
     ::before {
-        content: attr(data-parent);
+      content: attr(data-parent);
     }
-
+  }
+  .estvivante {
+    background-color: #b9bec6 !important;
   }
 }
 </style>
