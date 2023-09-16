@@ -98,11 +98,11 @@ export default {
       let ts1 = performance.now();
       //let copyInitialTable = JSON.parse(JSON.stringify(this.initialTable));
 
-      let cellsAlive = this.initialTable.filter(function(cell) {
+      let cellsAlive = this.initialTable.filter(function (cell) {
         return cell.isAlive === true;
       });
 
-      cellsAlive.forEach(cell => {
+      cellsAlive.forEach((cell) => {
         //console.log('------------');
         //console.log('cellule en cours : '+ 'row : '+cell.row+ 'col : '+cell.col);
         let neighboursCellulesVivantes = this.getNeighbours(
@@ -112,8 +112,9 @@ export default {
         //console.log('voisines de la cellule en cours');
         //console.log(neighboursCellulesVivantes); // get les 8 voisins
 
-        neighboursCellulesVivantes.forEach(cellOther => {
-          this.initialTable[cellOther.col + cellOther.row * this.nbCols].nbVoisins++
+        neighboursCellulesVivantes.forEach((cellOther) => {
+          this.initialTable[cellOther.col + cellOther.row * this.nbCols]
+            .nbVoisins++;
           // c'est ici que le "tri" est fait entre mort et vivant
         });
       });
@@ -142,48 +143,50 @@ export default {
       let cellulesAlive = [];
       //console.log('-- checkCellules --');
 
-      this.initialTable.forEach(cell => {
-        let celluleNoire = cell.isAlive === true
+      this.initialTable.forEach((cell) => {
+        let celluleNoire = cell.isAlive === true;
 
-          if ((!celluleNoire && cell.nbVoisins == 3) ||(celluleNoire && (cell.nbVoisins == 2 || cell.nbVoisins == 3))) {
-            //console.log('celluleNoire : '+celluleNoire);
-            //console.log('cell.nbVoisins : '+cell.nbVoisins);
-            cellulesAlive.push(cell);
-          }
-
+        if (
+          (!celluleNoire && cell.nbVoisins == 3) ||
+          (celluleNoire && (cell.nbVoisins == 2 || cell.nbVoisins == 3))
+        ) {
+          //console.log('celluleNoire : '+celluleNoire);
+          //console.log('cell.nbVoisins : '+cell.nbVoisins);
+          cellulesAlive.push(cell);
+        }
       });
       //console.log('-- END checkCellules --');
       return cellulesAlive;
     },
     getNeighbours(row, col) {
-    let voisins = [];
+      let voisins = [];
 
       // Traitement de la ligne précédente
       if (row - 1 >= 0) {
         if (col - 1 >= 0) {
-          voisins.push(this.initialTable[(col -1) + (row -1)* this.nbCols]);
+          voisins.push(this.initialTable[col - 1 + (row - 1) * this.nbCols]);
         }
         if (col + 1 < this.nbCols) {
-          voisins.push(this.initialTable[(col +1) + (row -1)* this.nbCols]);
+          voisins.push(this.initialTable[col + 1 + (row - 1) * this.nbCols]);
         }
-        voisins.push(this.initialTable[(col) + (row -1)* this.nbCols]);
+        voisins.push(this.initialTable[col + (row - 1) * this.nbCols]);
       }
       // Traitement de la ligne en cours
       if (col - 1 >= 0) {
-        voisins.push(this.initialTable[(col -1) + (row)* this.nbCols]);
+        voisins.push(this.initialTable[col - 1 + row * this.nbCols]);
       }
       if (col + 1 < this.nbCols) {
-        voisins.push(this.initialTable[(col +1) + (row)* this.nbCols]);
+        voisins.push(this.initialTable[col + 1 + row * this.nbCols]);
       }
       // Traitement de la ligne suivante
       if (row + 1 < this.nbRows) {
         if (col - 1 >= 0) {
-          voisins.push(this.initialTable[(col -1) + (row +1)* this.nbCols]);
+          voisins.push(this.initialTable[col - 1 + (row + 1) * this.nbCols]);
         }
         if (col + 1 < this.nbCols) {
-          voisins.push(this.initialTable[(col +1) + (row +1)* this.nbCols]);
+          voisins.push(this.initialTable[col + 1 + (row + 1) * this.nbCols]);
         }
-        voisins.push(this.initialTable[(col) + (row +1)* this.nbCols]);
+        voisins.push(this.initialTable[col + (row + 1) * this.nbCols]);
       }
       return voisins;
     },
