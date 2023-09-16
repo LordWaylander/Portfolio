@@ -9,7 +9,7 @@
         <button type="button" name="button" id="start" @click="play()">
           <img src="/img/play-solid.png" alt="" />
         </button>
-        <button type="button" name="button" id="pause" @click="pause()">
+        <button type="button" name="button" id="pause" @click="stop()">
           <img src="/img/pause-solid.png" alt="" />
         </button>
         <button type="button" name="button" id="restart" @click="restart()">
@@ -33,62 +33,33 @@ export default {
       maxCol: 0,
       maxRow: 0,
       maxCell: 0,
-      cellSizeInPx: 10,
-      gameBoard: Array,
-      nextBoard: Array,
-      board: Object,
+      gameBoard: null,
+      board: [],
+      nextBoard: [],
+      updateCellsIndex: null,
       cells: [],
+      started: false,
       rafId: undefined,
-      nIntervId: null,
-      direction: [
-        { x: -1, y: -1 },
-        { x: 0, y: -1 },
-        { x: 1, y: -1 },
-        { x: -1, y: 0 },
-        { x: 1, y: 0 },
-        { x: -1, y: 1 },
-        { x: 0, y: 1 },
-        { x: 1, y: 1 },
-      ],
+      cellSizeInPx: 10,
     };
   },
   mounted() {
-    this.initialize();
-    this.play();
+    this.init();
+    //this.play();
   },
   beforeUnmount() {
     this.clearIntervalId();
     this.nbGeneration = 0;
   },
   methods: {
-    initialize() {
-      this.board = document.getElementById("gameBoard_table");
-      this.reset();
-      this.buildGameBoardTable();
-    },
-    reset() {
-      this.maxCol = Math.floor(window.innerWidth / this.cellSizeInPx);
-      this.maxRow = Math.floor(window.innerHeight / this.cellSizeInPx);
-      this.maxCell = this.maxRow * this.maxCol;
-      console.log("cellSizeInPx = ", this.cellSizeInPx);
-      console.log("maxCol = ", this.maxCol);
-      console.log("maxRow = ", this.maxRow);
-      console.log("maxCell = ", this.maxCell);
-      this.initRandomCells();
-    },
-    initRandomCells() {
-      this.gameBoard = Array.from({ length: this.maxCell }, () =>
-        Math.round(Math.random()),
-      );
-      this.nextBoard = Array.from({ length: this.maxCell }, () => 0);
-    },
     buildGameBoardTable() {
-      let ts1 = performance.now();
-
       this.board.textContent = "";
+      this.cells = [];
 
       const createCol = () => {
-        return document.createElement("td");
+        const newCol = document.createElement("td");
+        newCol.setAttribute("data-cell-is-alive", "0");
+        return newCol;
       };
 
       const createRow = () => {
@@ -104,53 +75,18 @@ export default {
         }
         this.board.appendChild(newRow);
       }
-      let ts2 = performance.now();
-      console.log("buildGameBoardTable : " + (ts2 - ts1));
-      this.update();
     },
-    update() {
-      let ts1 = performance.now();
-      let currentPosX = 0;
-      let currentPosY = 0;
-
-      for (let cellPos = 0; cellPos < this.maxCell; cellPos++) {
-        const currentValue = this.gameBoard[cellPos];
-        const isCurrentCellLive = currentValue === 1;
-
-        const neighboursAlive = this.getAliveCellNeighboursAt(
-          currentPosX,
-          currentPosY,
-        );
-
-        const mustDie =
-          isCurrentCellLive && (neighboursAlive < 2 || neighboursAlive > 3);
-        const mustLive =
-          (!isCurrentCellLive && neighboursAlive === 3) ||
-          (isCurrentCellLive &&
-            (neighboursAlive === 2 || neighboursAlive === 3));
-
-        const newValue = mustDie ? 0 : mustLive ? 1 : 0;
-
-        if (currentValue !== newValue) {
-          this.updateDisplayCell(cellPos, newValue);
-        }
-
-        currentPosX++;
-        if (currentPosX === this.maxCol) {
-          currentPosX = 0;
-          currentPosY++;
-        }
-      }
-
-      this.nbGeneration++;
-
-      //this.gameBoard = [...this.nextBoard]
-      //this.gameBoard = Array().concat(this.nextBoard)
-      //this.gameBoard = structuredClone(this.nextBoard)
-      this.gameBoard = this.nextBoard.slice(0);
-      let ts2 = performance.now();
-      console.log("play : " + (ts2 - ts1));
+    initRandomCells() {
+      this.gameBoard = this.gameBoard.map(() => Math.round(Math.random()));
     },
+    reset() {
+      this.gameBoard = this.gameBoard.fill(0);
+      this.initRandomCells();
+      this.nextBoard = this.gameBoard.slice(0);
+      this.updateCellsIndex = new Set([...this.gameBoard.keys()]);
+      this.buildGameBoardTable();
+    },
+
     getAliveCellNeighboursAt(x, y) {
       const getCellState = (x, y) => {
         if (x >= 0 && x < this.maxCol && y >= 0 && y < this.maxRow) {
@@ -172,40 +108,147 @@ export default {
       return count;
     },
     updateDisplayCell(cellPos, newValue) {
-      this.nextBoard[cellPos] = newValue;
-
       this.cells[cellPos].setAttribute(
         "data-cell-is-alive",
         newValue.toString(),
       );
     },
-    pause() {
-      this.clearIntervalId();
-      cancelAnimationFrame(this.rafId);
-    },
-    restart() {
-      this.nbGeneration = 0;
-      this.pause();
-      this.reset();
-      this.play();
+    update() {
+      let ts1 = performance.now();
+      const delta = 1 / this.maxCol;
+      const nextChanges = new Set(this.updateCellsIndex);
+      for (let cellPos of this.updateCellsIndex) {
+        const currentValue = this.gameBoard[cellPos];
+        const isCurrentCellLive = currentValue === 1;
+
+        const currentPosX = cellPos % this.maxCol;
+        const currentPosY = Math.floor(cellPos * delta);
+
+        const neighboursAlive = this.getAliveCellNeighboursAt(
+          currentPosX,
+          currentPosY,
+        );
+
+        const itMustDie =
+          isCurrentCellLive && (neighboursAlive < 2 || neighboursAlive > 3);
+        const itMustLive =
+          (!isCurrentCellLive && neighboursAlive === 3) ||
+          (isCurrentCellLive &&
+            (neighboursAlive === 2 || neighboursAlive === 3));
+
+        const newValue = itMustDie ? 0 : itMustLive ? 1 : currentValue;
+
+        if (currentValue !== newValue) {
+          this.updateDisplayCell(cellPos, newValue);
+          nextChanges.add(cellPos);
+
+          this.addNeighbourToNextChanges(
+            currentPosX + 1,
+            currentPosY,
+            nextChanges,
+          );
+          this.addNeighbourToNextChanges(
+            currentPosX - 1,
+            currentPosY,
+            nextChanges,
+          );
+          this.addNeighbourToNextChanges(
+            currentPosX + 1,
+            currentPosY - 1,
+            nextChanges,
+          );
+          this.addNeighbourToNextChanges(
+            currentPosX - 1,
+            currentPosY - 1,
+            nextChanges,
+          );
+          this.addNeighbourToNextChanges(
+            currentPosX,
+            currentPosY - 1,
+            nextChanges,
+          );
+          this.addNeighbourToNextChanges(
+            currentPosX + 1,
+            currentPosY + 1,
+            nextChanges,
+          );
+          this.addNeighbourToNextChanges(
+            currentPosX - 1,
+            currentPosY + 1,
+            nextChanges,
+          );
+          this.addNeighbourToNextChanges(
+            currentPosX,
+            currentPosY + 1,
+            nextChanges,
+          );
+        }
+        this.nextBoard[cellPos] = newValue;
+      }
+
+      this.gameBoard = this.nextBoard.slice(0);
+      this.updateCellsIndex = nextChanges;
+
+      if (!this.started) {
+        cancelAnimationFrame(this.rafId);
+        return;
+      }
+      let ts2 = performance.now();
+      console.log("update : " + (ts2 - ts1));
+
+      this.rafId = window.requestAnimationFrame(this.update.bind(this));
     },
     play() {
-      let self = this;
-      if (!this.nIntervId) {
-        this.nIntervId = setInterval(function () {
-          self.rafId = window.requestAnimationFrame(self.update.bind(self));
-        }, 400);
-      }
+      this.started = true;
+      this.rafId = window.requestAnimationFrame(this.update.bind(this));
     },
-    clearIntervalId() {
-      clearInterval(this.nIntervId);
-      this.nIntervId = null;
+
+    stop() {
+      this.started = false;
+      cancelAnimationFrame(this.rafId);
+      //clearInterval(this.rafId)
+    },
+    restart() {
+      this.stop();
+      this.reset();
+    },
+
+    init() {
+      this.maxCol = Math.floor(window.innerWidth / this.cellSizeInPx);
+      this.maxRow = Math.floor(window.innerHeight / this.cellSizeInPx);
+      this.maxCell = this.maxRow * this.maxCol;
+
+      const r = document.querySelector(":root");
+      r.style.setProperty("--cell-size", `${this.cellSizeInPx}px`);
+
+      this.gameBoard = new Array(this.maxCell);
+
+      this.board = document.getElementById("gameBoard_table");
+      this.reset();
+    },
+
+    addNeighbourToNextChanges(x, y, nextChanges) {
+      if (x >= 0 && x < this.maxCol && y >= 0 && y < this.maxRow) {
+        nextChanges.add(x + y * this.maxCol);
+      }
     },
   },
 };
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
+td[data-cell-is-alive="1"] {
+  background-color: #b9bec6;
+}
+td[data-cell-is-alive="0"] {
+  background-color: var(--color-background);
+}
 #gameLife {
+  td[data-cell-is-alive="1"] {
+    background-color: #b9bec6;
+  }
+  td[data-cell-is-alive="0"] {
+    background-color: var(--color-background);
+  }
   z-index: 1;
   position: absolute;
   top: 0;
@@ -255,6 +298,18 @@ export default {
     ::before {
       content: attr(data-parent);
     }
+    td[data-cell-is-alive="1"] {
+      background-color: #b9bec6;
+    }
+    td[data-cell-is-alive="0"] {
+      background-color: var(--color-background);
+    }
+  }
+  td[data-cell-is-alive="1"] {
+    background-color: #b9bec6;
+  }
+  td[data-cell-is-alive="0"] {
+    background-color: var(--color-background);
   }
 }
 </style>
