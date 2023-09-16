@@ -22,7 +22,11 @@
         <tr v-for="row in nbRows">
           <td
             v-for="col in nbCols"
-            :class="[initialTable[col - 1 + (row - 1)*nbCols].isAlive ? 'isAlive' : '']"
+            :class="[
+              initialTable[col - 1 + (row - 1) * nbCols].isAlive
+                ? 'isAlive'
+                : '',
+            ]"
             :data-row="row - 1"
             :data-col="col - 1"
             @click="defineAlive($event)"
@@ -50,7 +54,7 @@ export default {
     this.init();
   },
   mounted() {
-    //this.start()
+    this.start();
   },
   beforeUnmount() {
     this.clearnIntervId();
@@ -95,30 +99,31 @@ export default {
       let ts1 = performance.now();
       /**
        * MOYENNE : 361.5 ms
-      */
-       let copyInitialTable = JSON.parse(JSON.stringify(this.initialTable));
+       */
+      let copyInitialTable = JSON.parse(JSON.stringify(this.initialTable));
 
       for (let i = 0; i < copyInitialTable.length; i++) {
         const cell = copyInitialTable[i];
         const previousState = cell.isAlive;
         const neighboursAlive = this.getNeighboursAlive(cell.row, cell.col);
-        const mustDie = cell.isAlive && (neighboursAlive < 2 || neighboursAlive > 3);
-        const mustLive = (!cell.isAlive && neighboursAlive === 3) || (cell.isAlive && (neighboursAlive === 2 || neighboursAlive === 3));
+        const mustDie =
+          cell.isAlive && (neighboursAlive < 2 || neighboursAlive > 3);
+        const mustLive =
+          (!cell.isAlive && neighboursAlive === 3) ||
+          (cell.isAlive && (neighboursAlive === 2 || neighboursAlive === 3));
         const nextState = mustDie ? false : mustLive ? true : false;
 
         if (previousState !== nextState) {
-          copyInitialTable[cell.col + (cell.row)*this.nbCols].isAlive = nextState;
+          copyInitialTable[cell.col + cell.row * this.nbCols].isAlive =
+            nextState;
         }
-
-        
       }
       this.initialTable = copyInitialTable;
-      
 
       /**
        * MOYENNE : 389.1 ms -> 391.4 ms ...
        * */
-/*
+      /*
       let cellWhoWillLive = []
       copyInitialTable.forEach(cell => {
         const neighboursAlive = this.getNeighboursAlive(cell.row, cell.col);
@@ -139,10 +144,10 @@ export default {
     },
     updateFront(cellWhoWillLive) {
       for (const cell of this.initialTable) {
-        cell.isAlive = false
+        cell.isAlive = false;
       }
       for (const cell of cellWhoWillLive) {
-        this.initialTable[cell.col + cell.row*this.nbCols].isAlive =true
+        this.initialTable[cell.col + cell.row * this.nbCols].isAlive = true;
       }
 
       this.nbGeneration++;
@@ -154,7 +159,7 @@ export default {
           row < this.nbRows &&
           col >= 0 &&
           col < this.nbCols &&
-          this.initialTable[col + (row)*this.nbCols].isAlive === true
+          this.initialTable[col + row * this.nbCols].isAlive === true
         ) {
           return 1;
         }
@@ -195,11 +200,11 @@ export default {
       const row = parseInt(e.target.attributes["data-row"].value);
       const col = parseInt(e.target.attributes["data-col"].value);
 
-      if (this.initialTable[col + (row)*this.nbCols].isAlive) {
-        this.initialTable[col + (row)*this.nbCols].isAlive = false;
+      if (this.initialTable[col + row * this.nbCols].isAlive) {
+        this.initialTable[col + row * this.nbCols].isAlive = false;
         e.target.classList.remove("isAlive");
       } else {
-        this.initialTable[col + (row)*this.nbCols].isAlive = true;
+        this.initialTable[col + row * this.nbCols].isAlive = true;
         e.target.classList.add("isAlive");
       }
     },
