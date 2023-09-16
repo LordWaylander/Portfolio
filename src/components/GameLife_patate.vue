@@ -45,7 +45,7 @@ export default {
   },
   mounted() {
     this.setEtat();
-    //this.start();
+    this.start();
   },
   beforeUnmount() {
     this.clearnIntervId();
@@ -53,8 +53,8 @@ export default {
   },
   methods: {
     setVariables() {
-      this.nbCol = 300; //Math.floor(window.innerWidth / this.cellSizeInPx);
-      this.nbRow = 300; //Math.floor(window.innerHeight / this.cellSizeInPx);
+      this.nbCol = Math.floor(window.innerWidth / this.cellSizeInPx);
+      this.nbRow = Math.floor(window.innerHeight / this.cellSizeInPx);
       console.log("cellSizeInPx = ", this.cellSizeInPx);
       console.log("nbCol = ", this.nbCol);
       console.log("nbRow = ", this.nbRow);
@@ -195,7 +195,7 @@ export default {
     },
     start() {
       if (!this.nIntervId) {
-        this.nIntervId = setInterval(this.play, 400);
+        this.nIntervId = setInterval(this.play, 1);
       }
     },
     pause() {
@@ -215,7 +215,7 @@ export default {
   },
 };
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 #gameLife {
   z-index: 1;
   position: absolute;

@@ -18,7 +18,9 @@
 </template>
 <script setup>
 import { RouterLink } from "vue-router";
-import GameLife from "../components/GameLife.vue";
+import GameLife from "../components/GameLife.vue"; // init : 76, play : 161.1 ms
+import GameLife_patate from "../components/GameLife_patate.vue"; // init : 86, play : 125.7 ms
+import GameLife_jerome from "../components/GameLife_jerome.vue";
 </script>
 <style lang="scss" scoped>
 .menu {

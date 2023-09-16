@@ -14,7 +14,6 @@
       <div>
         <button @click="play()">Play</button>
         <button @click="pause()">Pause</button>
-        <button @click="reset()">Reset</button>
       </div>
     </div>
     <table id="gameBoard">
@@ -97,100 +96,105 @@ export default {
     },
     play() {
       let ts1 = performance.now();
-      /**
-       * MOYENNE : 361.5 ms
-       */
-      let copyInitialTable = JSON.parse(JSON.stringify(this.initialTable));
+      //let copyInitialTable = JSON.parse(JSON.stringify(this.initialTable));
 
-      for (let i = 0; i < copyInitialTable.length; i++) {
-        const cell = copyInitialTable[i];
-        const previousState = cell.isAlive;
-        const neighboursAlive = this.getNeighboursAlive(cell.row, cell.col);
-        const mustDie =
-          cell.isAlive && (neighboursAlive < 2 || neighboursAlive > 3);
-        const mustLive =
-          (!cell.isAlive && neighboursAlive === 3) ||
-          (cell.isAlive && (neighboursAlive === 2 || neighboursAlive === 3));
-        const nextState = mustDie ? false : mustLive ? true : false;
-
-        if (previousState !== nextState) {
-          copyInitialTable[cell.col + cell.row * this.nbCols].isAlive =
-            nextState;
-        }
-      }
-      this.initialTable = copyInitialTable;
-
-      /**
-       * MOYENNE : 389.1 ms -> 391.4 ms ...
-       * */
-      /*
-      let cellWhoWillLive = []
-      copyInitialTable.forEach(cell => {
-        const neighboursAlive = this.getNeighboursAlive(cell.row, cell.col);
-        copyInitialTable[cell.col + cell.row*this.nbCols].nbVoisins = neighboursAlive
-
-        const mustLive = (!cell.isAlive && neighboursAlive === 3) || (cell.isAlive && (neighboursAlive === 2 || neighboursAlive === 3));
-        const nextState = mustLive ? true : false ;
-
-        if(nextState === true) {
-            cellWhoWillLive.push(copyInitialTable[cell.col + cell.row*this.nbCols])
-        }
+      let cellsAlive = this.initialTable.filter(function(cell) {
+        return cell.isAlive === true;
       });
-      this.updateFront(cellWhoWillLive)
-      */
+
+      cellsAlive.forEach(cell => {
+        //console.log('------------');
+        //console.log('cellule en cours : '+ 'row : '+cell.row+ 'col : '+cell.col);
+        let neighboursCellulesVivantes = this.getNeighbours(
+          parseInt(cell.row),
+          parseInt(cell.col),
+        );
+        //console.log('voisines de la cellule en cours');
+        //console.log(neighboursCellulesVivantes); // get les 8 voisins
+
+        neighboursCellulesVivantes.forEach(cellOther => {
+          this.initialTable[cellOther.col + cellOther.row * this.nbCols].nbVoisins++
+          // c'est ici que le "tri" est fait entre mort et vivant
+        });
+      });
+      //console.log(this.initialTable);
+
+      let cellulesAlive = this.checkCellules();
+      //console.log(cellulesAlive);
+      this.updateFront(cellulesAlive);
 
       let ts2 = performance.now();
       console.log("play : " + (ts2 - ts1));
     },
-    updateFront(cellWhoWillLive) {
+    updateFront(cellulesAlive) {
       for (const cell of this.initialTable) {
         cell.isAlive = false;
+        cell.nbVoisins = 0;
       }
-      for (const cell of cellWhoWillLive) {
+
+      for (const cell of cellulesAlive) {
         this.initialTable[cell.col + cell.row * this.nbCols].isAlive = true;
       }
 
       this.nbGeneration++;
     },
-    getNeighboursAlive(row, col) {
-      const getCellState = (row, col) => {
-        if (
-          row >= 0 &&
-          row < this.nbRows &&
-          col >= 0 &&
-          col < this.nbCols &&
-          this.initialTable[col + row * this.nbCols].isAlive === true
-        ) {
-          return 1;
+    checkCellules() {
+      let cellulesAlive = [];
+      //console.log('-- checkCellules --');
+
+      this.initialTable.forEach(cell => {
+        let celluleNoire = cell.isAlive === true
+
+          if ((!celluleNoire && cell.nbVoisins == 3) ||(celluleNoire && (cell.nbVoisins == 2 || cell.nbVoisins == 3))) {
+            //console.log('celluleNoire : '+celluleNoire);
+            //console.log('cell.nbVoisins : '+cell.nbVoisins);
+            cellulesAlive.push(cell);
+          }
+
+      });
+      //console.log('-- END checkCellules --');
+      return cellulesAlive;
+    },
+    getNeighbours(row, col) {
+    let voisins = [];
+
+      // Traitement de la ligne précédente
+      if (row - 1 >= 0) {
+        if (col - 1 >= 0) {
+          voisins.push(this.initialTable[(col -1) + (row -1)* this.nbCols]);
         }
-        return 0;
-      };
-
-      const count =
-        getCellState(row + 1, col) +
-        getCellState(row - 1, col) +
-        getCellState(row + 1, col - 1) +
-        getCellState(row - 1, col - 1) +
-        getCellState(row, col - 1) +
-        getCellState(row + 1, col + 1) +
-        getCellState(row - 1, col + 1) +
-        getCellState(row, col + 1);
-
-      return count;
+        if (col + 1 < this.nbCols) {
+          voisins.push(this.initialTable[(col +1) + (row -1)* this.nbCols]);
+        }
+        voisins.push(this.initialTable[(col) + (row -1)* this.nbCols]);
+      }
+      // Traitement de la ligne en cours
+      if (col - 1 >= 0) {
+        voisins.push(this.initialTable[(col -1) + (row)* this.nbCols]);
+      }
+      if (col + 1 < this.nbCols) {
+        voisins.push(this.initialTable[(col +1) + (row)* this.nbCols]);
+      }
+      // Traitement de la ligne suivante
+      if (row + 1 < this.nbRows) {
+        if (col - 1 >= 0) {
+          voisins.push(this.initialTable[(col -1) + (row +1)* this.nbCols]);
+        }
+        if (col + 1 < this.nbCols) {
+          voisins.push(this.initialTable[(col +1) + (row +1)* this.nbCols]);
+        }
+        voisins.push(this.initialTable[(col) + (row +1)* this.nbCols]);
+      }
+      return voisins;
     },
     start() {
       if (!this.nIntervId) {
-        this.nIntervId = setInterval(this.play, 400);
+        this.nIntervId = setInterval(this.play, 250);
       }
       //this.play()
     },
     pause() {
       this.clearnIntervId();
-    },
-    reset() {
-      this.clearnIntervId();
-      this.nbGeneration = 0;
-      this.createInitialCells();
     },
     clearnIntervId() {
       clearInterval(this.nIntervId);
