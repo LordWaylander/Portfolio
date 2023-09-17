@@ -17,10 +17,7 @@
   </main>
 </template>
 <script setup>
-import { RouterLink } from "vue-router";
-import GameLife from "../components/GameLife.vue"; // init : 76, play : 161.1 ms
-import GameLife_patate from "../components/GameLife_patate.vue"; // init : 86, play : 125.7 ms
-import GameLife_jerome from "../components/GameLife_jerome.vue";
+import GameLife from '../components/GameLife.vue'
 </script>
 <style lang="scss" scoped>
 .menu {
@@ -29,7 +26,7 @@ import GameLife_jerome from "../components/GameLife_jerome.vue";
   height: 50vh;
   flex-direction: column;
   border-radius: 5em;
-  z-index: 999999;
+  z-index: 10;
   h1 {
     font-family: UKIJRu;
     font-size: 5em;
