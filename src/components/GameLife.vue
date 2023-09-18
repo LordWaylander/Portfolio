@@ -70,8 +70,8 @@ export default {
       this.createInitialCells();
     },
     setVariables() {
-      (this.gameBoard = new Array()),
-        (this.nbCols = Math.floor(window.innerWidth / this.cellSizeInPx));
+      this.gameBoard = new Array();
+      this.nbCols = Math.floor(window.innerWidth / this.cellSizeInPx);
       this.nbRows = Math.floor(window.innerHeight / this.cellSizeInPx);
       this.matricePosition = [
         -1, // left
@@ -83,10 +83,6 @@ export default {
         +(this.nbCols - 1), // BottomLeft
         +(this.nbCols + 1), // BottomRight
       ];
-      console.log("cellSizeInPx = ", this.cellSizeInPx);
-      console.log("nbCols = ", this.nbCols);
-      console.log("nbRows = ", this.nbRows);
-      console.log("matricePosition ", this.matricePosition);
     },
     createInitialCells() {
       for (let i = 0; i < this.nbRows; i++) {
@@ -171,7 +167,6 @@ export default {
       if (!this.nIntervId) {
         this.nIntervId = setInterval(this.play, 250);
       }
-      //this.play()
     },
     pause() {
       this.clearnIntervId();
@@ -179,7 +174,6 @@ export default {
     restart() {
       this.clearnIntervId();
       this.nbGeneration = 0;
-      this.nIntervId = null;
       this.init();
       this.start();
     },
