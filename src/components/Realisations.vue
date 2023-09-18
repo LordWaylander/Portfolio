@@ -6,9 +6,6 @@
     </div>
   </div>
 </template>
-<script setup>
-import Card from "./Card.vue";
-</script>
 <script>
 export default {
   data() {

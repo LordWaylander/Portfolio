@@ -23,7 +23,7 @@
         </button>
       </div>
     </div>
-    <GameLifeGameBoard
+    <GameLifeBoard
       :startApp="startApp"
       :pauseApp="pauseApp"
       :restartApp="restartApp"
@@ -31,9 +31,6 @@
     />
   </div>
 </template>
-<script setup>
-import GameLifeGameBoard from "../components/GameLifeGameBoard.vue";
-</script>
 <script>
 export default {
   data() {

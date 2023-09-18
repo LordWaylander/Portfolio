@@ -1,12 +1,7 @@
 <template>
-  <GameLifeGameBoard v-if="route !== 'gameLife'" />
+  <GameLifeBoard v-if="route !== 'gameLife'" />
   <RouterView />
 </template>
-
-<script setup>
-import GameLifeGameBoard from "./components/GameLifeGameBoard.vue";
-import { RouterView } from "vue-router";
-</script>
 <script>
 export default {
   data() {

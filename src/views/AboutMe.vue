@@ -17,12 +17,6 @@
     </footer>
   </main>
 </template>
-<script setup>
-import Presentation from "../components/Presentation.vue";
-import Realisations from "../components/Realisations.vue";
-import Experiences from "../components/Experiences.vue";
-import SavoirFaire from "../components/SavoirFaire.vue";
-</script>
 <style lang="scss" scoped>
 section {
   display: flex;

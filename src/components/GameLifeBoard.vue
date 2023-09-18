@@ -173,8 +173,7 @@ export default {
         this.gameBoard[cell.col + cell.row * this.nbCols].isAlive = true;
       }
 
-      this.nbGeneration++;
-      this.$emit("updateNbGeneration", this.nbGeneration);
+      this.$emit("updateNbGeneration", this.nbGeneration++);
     },
     start() {
       if (!this.nIntervId) {
@@ -215,11 +214,6 @@ export default {
   width: 100vw;
   height: 100vh;
   tr {
-    td {
-      span {
-        display: block;
-      }
-    }
     td.isAlive {
       background-color: #b9bec6 !important;
     }
