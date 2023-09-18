@@ -18,6 +18,9 @@
         <button @click="pause()">
           <img src="/img/pause-solid.png" alt="pause game" />
         </button>
+        <button @click="restart()">
+          <img src="/img/rotate-right-solid.png" alt="restart game" />
+        </button>
       </div>
     </div>
     <table id="gameBoard">
@@ -26,9 +29,7 @@
           <td
             v-for="col in nbCols"
             :class="[
-              gameBoard[col - 1 + (row - 1) * nbCols].isAlive
-                ? 'isAlive'
-                : '',
+              gameBoard[col - 1 + (row - 1) * nbCols].isAlive ? 'isAlive' : '',
             ]"
             :data-row="row - 1"
             :data-col="col - 1"
@@ -51,14 +52,13 @@ export default {
       gameBoard: new Array(),
       matricePosition: new Array(),
       nIntervId: null,
-      isLoading: true, // ?
     };
   },
   created() {
     this.init();
   },
   mounted() {
-    //this.start();
+    this.start();
   },
   beforeUnmount() {
     this.clearnIntervId();
@@ -66,19 +66,12 @@ export default {
   },
   methods: {
     init() {
-
-      let ts1 = performance.now();
-
       this.setVariables();
       this.createInitialCells();
-      this.isLoading = false
-
-      let ts2 = performance.now();
-      console.log("init : " + (ts2 - ts1)); // moyenne 79.2 ms
     },
     setVariables() {
-
-      this.nbCols = Math.floor(window.innerWidth / this.cellSizeInPx);
+      (this.gameBoard = new Array()),
+        (this.nbCols = Math.floor(window.innerWidth / this.cellSizeInPx));
       this.nbRows = Math.floor(window.innerHeight / this.cellSizeInPx);
       this.matricePosition = [
         -1, // left
@@ -89,7 +82,7 @@ export default {
         +this.nbCols, // bottom
         +(this.nbCols - 1), // BottomLeft
         +(this.nbCols + 1), // BottomRight
-      ]
+      ];
       console.log("cellSizeInPx = ", this.cellSizeInPx);
       console.log("nbCols = ", this.nbCols);
       console.log("nbRows = ", this.nbRows);
@@ -112,8 +105,6 @@ export default {
       }
     },
     play() {
-      let ts1 = performance.now();
-
       let cellsAlive = this.getCellsAlive();
 
       cellsAlive.forEach((cell) => {
@@ -123,15 +114,6 @@ export default {
       let cellulesAlive = this.checkCellules();
 
       this.updateFront(cellulesAlive);
-
-      let ts2 = performance.now();
-      console.log("play : " + (ts2 - ts1)); 
-      /**
-       * // moyenne 50 gen, 
-       * ancien algo : 156.22
-       * new algo : 140.22
-       */
-      this.totalTime += (ts2 - ts1)
     },
     getCellsAlive() {
       return this.gameBoard.filter((cell) => {
@@ -139,21 +121,26 @@ export default {
       });
     },
     getNumberNeighborsCell(cellule) {
-      
-      const row = cellule.row
-      const col = cellule.col
-      const index = col + row* this.nbCols;
-      const maxX = (this.nbCols - 1);
-      const maxY = (this.nbRows -1);
+      const row = cellule.row;
+      const col = cellule.col;
+      const index = col + row * this.nbCols;
+      const maxX = this.nbCols - 1;
+      const maxY = this.nbRows - 1;
 
-      if (col > 0) this.gameBoard[index + this.matricePosition[0]].nbVoisins++ 
-      if (col < maxX) this.gameBoard[index + this.matricePosition[1]].nbVoisins++
-      if (row > 0) this.gameBoard[index + this.matricePosition[2]].nbVoisins++
-      if (row > 0 && col > 0) this.gameBoard[index + this.matricePosition[3]].nbVoisins++
-      if (row > 0 && col < maxX) this.gameBoard[index + this.matricePosition[4]].nbVoisins++
-      if (row < maxY) this.gameBoard[index + this.matricePosition[5]].nbVoisins++
-      if (row < maxY && col > 0) this.gameBoard[index + this.matricePosition[6]].nbVoisins++
-      if (row < maxY && col < maxX) this.gameBoard[index + this.matricePosition[7]].nbVoisins++
+      if (col > 0) this.gameBoard[index + this.matricePosition[0]].nbVoisins++;
+      if (col < maxX)
+        this.gameBoard[index + this.matricePosition[1]].nbVoisins++;
+      if (row > 0) this.gameBoard[index + this.matricePosition[2]].nbVoisins++;
+      if (row > 0 && col > 0)
+        this.gameBoard[index + this.matricePosition[3]].nbVoisins++;
+      if (row > 0 && col < maxX)
+        this.gameBoard[index + this.matricePosition[4]].nbVoisins++;
+      if (row < maxY)
+        this.gameBoard[index + this.matricePosition[5]].nbVoisins++;
+      if (row < maxY && col > 0)
+        this.gameBoard[index + this.matricePosition[6]].nbVoisins++;
+      if (row < maxY && col < maxX)
+        this.gameBoard[index + this.matricePosition[7]].nbVoisins++;
     },
     checkCellules() {
       let cellulesAlive = [];
@@ -169,7 +156,6 @@ export default {
       return cellulesAlive;
     },
     updateFront(cellulesAlive) {
-
       for (const cell of this.gameBoard) {
         cell.isAlive = false;
         cell.nbVoisins = 0;
@@ -189,6 +175,13 @@ export default {
     },
     pause() {
       this.clearnIntervId();
+    },
+    restart() {
+      this.clearnIntervId();
+      this.nbGeneration = 0;
+      this.nIntervId = null;
+      this.init();
+      this.start();
     },
     clearnIntervId() {
       clearInterval(this.nIntervId);

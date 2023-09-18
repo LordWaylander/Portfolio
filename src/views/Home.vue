@@ -17,7 +17,7 @@
   </main>
 </template>
 <script setup>
-import GameLife from '../components/GameLife.vue'
+import GameLife from "../components/GameLife.vue";
 </script>
 <style lang="scss" scoped>
 .menu {

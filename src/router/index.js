@@ -16,9 +16,9 @@ const router = createRouter({
       component: Presentation,
     },
     {
-      path:'/:pathMatch(.*)*',
-      redirect: '/'
-    }
+      path: "/:pathMatch(.*)*",
+      redirect: "/",
+    },
   ],
 });
 
