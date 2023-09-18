@@ -1,58 +1,55 @@
 <template lang="">
-  <div id="tableGame">
-    <table id="gameBoard">
-      <tbody>
-        <tr v-for="row in nbRows">
-          <td
-            v-for="col in nbCols"
-            :class="[
-              gameBoard[col - 1 + (row - 1) * nbCols].isAlive ? 'isAlive' : '',
-            ]"
-            :data-row="row - 1"
-            :data-col="col - 1"
-            @click="defineAlive($event)"
-          ></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <table id="gameBoard">
+    <tbody>
+      <tr v-for="row in nbRows">
+        <td
+          v-for="col in nbCols"
+          :class="[
+            gameBoard[col - 1 + (row - 1) * nbCols].isAlive ? 'isAlive' : '',
+          ]"
+          :data-row="row - 1"
+          :data-col="col - 1"
+          @click="defineAlive($event)"
+        ></td>
+      </tr>
+    </tbody>
+  </table>
 </template>
 <script>
-
 export default {
-  props:{
+  props: {
     startApp: {
-      default: false
+      default: false,
     },
     pauseApp: {
-      default: false
+      default: false,
     },
     restartApp: {
-      default: false
-    }
+      default: false,
+    },
   },
   watch: {
-    'startApp': {
+    startApp: {
       handler(value) {
         if (value) {
-          this.start()
+          this.start();
         }
-      }
+      },
     },
-    'pauseApp': {
+    pauseApp: {
       handler(value) {
         if (value) {
-          this.pause()
+          this.pause();
         }
-      }
+      },
     },
-    'restartApp': {
+    restartApp: {
       handler(value) {
         if (value) {
-          this.restart()
+          this.restart();
         }
-      }
-    }
+      },
+    },
   },
   data() {
     return {
@@ -70,7 +67,7 @@ export default {
     this.init();
   },
   mounted() {
-    this.start()
+    this.start();
   },
   beforeUnmount() {
     this.clearnIntervId();
@@ -177,7 +174,7 @@ export default {
       }
 
       this.nbGeneration++;
-      this.$emit('updateNbGeneration', this.nbGeneration)
+      this.$emit("updateNbGeneration", this.nbGeneration);
     },
     start() {
       if (!this.nIntervId) {
@@ -213,21 +210,18 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-#tableGame {
-
+#gameBoard {
   position: fixed;
-  #gameBoard {
-    width: 100vw;
-    height: 100vh;
-    tr {
-      td {
-        span {
-          display: block;
-        }
+  width: 100vw;
+  height: 100vh;
+  tr {
+    td {
+      span {
+        display: block;
       }
-      td.isAlive {
-        background-color: #b9bec6 !important;
-      }
+    }
+    td.isAlive {
+      background-color: #b9bec6 !important;
     }
   }
 }

@@ -1,7 +1,6 @@
 <template>
-  <GameLifeGameBoard v-if="route !== 'gameLife'"/>
+  <GameLifeGameBoard v-if="route !== 'gameLife'" />
   <RouterView />
-  
 </template>
 
 <script setup>
@@ -12,19 +11,18 @@ import { RouterView } from "vue-router";
 export default {
   data() {
     return {
-      route: ''
-    }
+      route: "",
+    };
   },
   watch: {
-    '$route': {
-      handler(newValue){
-        this.route = newValue.name
+    $route: {
+      handler(newValue) {
+        this.route = newValue.name;
       },
-      deep: true
-    }
+      deep: true,
+    },
   },
-}
-
+};
 </script>
 
 <style scoped></style>

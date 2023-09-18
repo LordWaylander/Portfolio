@@ -2,12 +2,12 @@
   <div class="cover">
     <h1>Réalisations</h1>
     <div class="grid">
-        <Card :item="item" v-for="item in items"/>
+      <Card :item="item" v-for="item in items" />
     </div>
   </div>
 </template>
 <script setup>
-import Card from './Card.vue'
+import Card from "./Card.vue";
 </script>
 <script>
 export default {
@@ -35,6 +35,6 @@ export default {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-gap: 5em;
-  width: 60%
+  width: 60%;
 }
 </style>
