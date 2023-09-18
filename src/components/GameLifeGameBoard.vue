@@ -1,28 +1,5 @@
 <template lang="">
-  <div id="gameLife">
-    <div id="buttonsGroup">
-      <div>
-        <label for="generation">#</label>
-        <input
-          type="text"
-          name="generation"
-          id="generation"
-          disabled
-          v-model="nbGeneration"
-        />
-      </div>
-      <div>
-        <button @click="start()">
-          <img src="/img/play-solid.png" alt="play game" />
-        </button>
-        <button @click="pause()">
-          <img src="/img/pause-solid.png" alt="pause game" />
-        </button>
-        <button @click="restart()">
-          <img src="/img/rotate-right-solid.png" alt="restart game" />
-        </button>
-      </div>
-    </div>
+  <div id="tableGame">
     <table id="gameBoard">
       <tbody>
         <tr v-for="row in nbRows">
@@ -41,7 +18,42 @@
   </div>
 </template>
 <script>
+
 export default {
+  props:{
+    startApp: {
+      default: false
+    },
+    pauseApp: {
+      default: false
+    },
+    restartApp: {
+      default: false
+    }
+  },
+  watch: {
+    'startApp': {
+      handler(value) {
+        if (value) {
+          this.start()
+        }
+      }
+    },
+    'pauseApp': {
+      handler(value) {
+        if (value) {
+          this.pause()
+        }
+      }
+    },
+    'restartApp': {
+      handler(value) {
+        if (value) {
+          this.restart()
+        }
+      }
+    }
+  },
   data() {
     return {
       nbGeneration: 0,
@@ -58,7 +70,7 @@ export default {
     this.init();
   },
   mounted() {
-    this.start();
+    this.start()
   },
   beforeUnmount() {
     this.clearnIntervId();
@@ -101,6 +113,7 @@ export default {
       }
     },
     play() {
+      //let ts1 = performance.now()
       let cellsAlive = this.getCellsAlive();
 
       cellsAlive.forEach((cell) => {
@@ -110,6 +123,8 @@ export default {
       let cellulesAlive = this.checkCellules();
 
       this.updateFront(cellulesAlive);
+      //let ts2 = performance.now()
+      //console.log('play : '+(ts2-ts1));
     },
     getCellsAlive() {
       return this.gameBoard.filter((cell) => {
@@ -162,6 +177,7 @@ export default {
       }
 
       this.nbGeneration++;
+      this.$emit('updateNbGeneration', this.nbGeneration)
     },
     start() {
       if (!this.nIntervId) {
@@ -197,31 +213,9 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-#gameLife {
-  position: absolute;
-  width: 100vw;
-  height: 100vh;
-  #buttonsGroup {
-    position: absolute;
-    top: 0;
-    z-index: 20;
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    padding: 1em;
-    input {
-      width: 25%;
-    }
-    button {
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      img {
-        width: 25px;
-        height: 25px;
-      }
-    }
-  }
+#tableGame {
+
+  position: fixed;
   #gameBoard {
     width: 100vw;
     height: 100vh;
