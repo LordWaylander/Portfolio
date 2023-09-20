@@ -1,5 +1,5 @@
 <template>
-  <GameLifeBoard v-if="route !== 'gameLife' && route !== 'test'" />
+  <GameLifeBoard v-if="route !== 'gameLife'" />
   <RouterView />
 </template>
 <script>

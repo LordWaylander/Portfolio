@@ -62,6 +62,7 @@ export default {
       cellSizeInPx: 10,
       factorPopulation: 1.2,
       gameBoard: new Array(),
+      cellsAlives: new Array(),
       matricePosition: new Array(),
       nIntervId: null,
     };
@@ -85,7 +86,6 @@ export default {
       console.log('init : '+(ts2-ts1));
     },
     setVariables() {
-      this.gameBoard = new Array();
       this.nbCols = Math.floor(window.innerWidth / this.cellSizeInPx);
       this.nbRows = Math.floor(window.innerHeight / this.cellSizeInPx);
       this.matricePosition = [
@@ -112,28 +112,23 @@ export default {
             nbVoisins: 0,
           };
           this.gameBoard.push(cellsProperties);
+          cellsProperties.isAlive ? this.cellsAlives.push(cellsProperties) : ''
         }
       }
     },
     play() {
       let ts1 = performance.now()
-      let cellsAlive = this.getCellsAlive();
 
-      cellsAlive.forEach((cell) => {
+      this.cellsAlives.forEach((cell) => {
         this.getNumberNeighborsCell(cell);
       });
-
-      let cellulesAlive = this.checkCellules();
-
-      this.updateFront(cellulesAlive);
+      this.cellsAlives = []
+      this.checkCellules();
+      this.updateFront();
+      
       let ts2 = performance.now()
       this.moyenneTime += (ts2-ts1)
       //console.log('play : '+(ts2-ts1));
-    },
-    getCellsAlive() {
-      return this.gameBoard.filter((cell) => {
-        return cell.isAlive === true;
-      });
     },
     getNumberNeighborsCell(cellule) {
       const row = cellule.row;
@@ -141,17 +136,6 @@ export default {
       const index = col + row * this.nbCols;
       const maxX = this.nbCols - 1;
       const maxY = this.nbRows - 1;
-
-      this.matricePosition = [
-        -1, // left
-        +1, // right
-        -this.nbCols, // Top
-        -(this.nbCols + 1), // TopLeft
-        -(this.nbCols - 1), // TopRight
-        +this.nbCols, // bottom
-        +(this.nbCols - 1), // BottomLeft
-        +(this.nbCols + 1), // BottomRight
-      ];
 
       if (col > 0) this.gameBoard[index + this.matricePosition[0]].nbVoisins++;
       if (col < maxX)
@@ -169,23 +153,12 @@ export default {
         this.gameBoard[index + this.matricePosition[7]].nbVoisins++;
     },
     checkCellules() {
-      let cellulesAlive = [];
-      this.gameBoard.forEach((cell) => {
-        let celluleNoire = cell.isAlive === true;
-        if (
-          (!celluleNoire && cell.nbVoisins == 3) ||
-          (celluleNoire && (cell.nbVoisins == 2 || cell.nbVoisins == 3))
-        ) {
-          cellulesAlive.push(cell);
+      this.gameBoard.forEach(cellule => {
+        let isAlive = cellule.isAlive === true;
+        if ((!isAlive && cellule.nbVoisins == 3) ||(isAlive && (cellule.nbVoisins == 2 || cellule.nbVoisins == 3))) {
+          this.cellsAlives.push(cellule);
         }
       });
-      return cellulesAlive;
-      /*for (let i = 0; i < this.gameBoard.length; i++) {
-        let isAlive = this.gameBoard[i].isAlive === true;
-          const needLive = (isAlive &&(this.gameBoard[i].nbVoisins === 2 || this.gameBoard[i].nbVoisins === 3)) || (!isAlive && this.gameBoard[i].nbVoisins === 3);
-          this.gameBoard[i].isAlive = needLive ? true : false;
-          this.gameBoard[i].nbVoisins = 0
-      }*/
     },
     updateFront(cellulesAlive) {
       for (const cell of this.gameBoard) {
@@ -193,7 +166,7 @@ export default {
         cell.nbVoisins = 0;
       }
 
-      for (const cell of cellulesAlive) {
+      for (const cell of this.cellsAlives) {
         this.gameBoard[cell.col + cell.row * this.nbCols].isAlive = true;
       }
 
