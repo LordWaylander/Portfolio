@@ -17,19 +17,6 @@
   --section-gap: 160px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: var(--grey-black);
-    --color-background-soft: var(--grey);
-    --color-text: var(--primary-text);
-
-    --color-background-mute: var(--vt-c-black-mute);
-    --color-border: var(--vt-c-divider-dark-2);
-    --color-border-hover: var(--vt-c-divider-dark-1);
-    --color-heading: var(--vt-c-text-dark-1);
-  }
-}
-
 *,
 *::before,
 *::after {
@@ -40,8 +27,8 @@
 
 body {
   min-height: 100vh;
-  color: var(--color-text);
-  background: var(--color-background);
+  color: var(--primary-text);
+  background-color: var(--grey-black);
   font-family:
     Inter,
     -apple-system,

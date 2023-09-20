@@ -39,6 +39,7 @@ export default {
     pauseApp: {
       handler(value) {
         if (value) {
+          console.log('temps moyen d\'excecution : '+this.moyenneTime/this.nbGeneration);
           this.pause();
         }
       },
@@ -46,6 +47,7 @@ export default {
     restartApp: {
       handler(value) {
         if (value) {
+          this.moyenneTime = 0;
           this.restart();
         }
       },
@@ -53,6 +55,7 @@ export default {
   },
   data() {
     return {
+      moyenneTime: 0,
       nbGeneration: 0,
       nbCols: 0,
       nbRows: 0,
@@ -67,7 +70,7 @@ export default {
     this.init();
   },
   mounted() {
-    this.start();
+    //this.start();
   },
   beforeUnmount() {
     this.clearnIntervId();
@@ -80,8 +83,8 @@ export default {
     },
     setVariables() {
       this.gameBoard = new Array();
-      this.nbCols = Math.floor(window.innerWidth / this.cellSizeInPx);
-      this.nbRows = Math.floor(window.innerHeight / this.cellSizeInPx);
+      this.nbCols = 3//Math.floor(window.innerWidth / this.cellSizeInPx);
+      this.nbRows = 3//Math.floor(window.innerHeight / this.cellSizeInPx);
       this.matricePosition = [
         -1, // left
         +1, // right
@@ -101,7 +104,7 @@ export default {
             col: j,
             isAlive:
               Math.floor(Math.random() * this.factorPopulation) != 0
-                ? true
+                ? false
                 : false,
             nbVoisins: 0,
           };
@@ -110,17 +113,20 @@ export default {
       }
     },
     play() {
-      //let ts1 = performance.now()
+      let ts1 = performance.now()
       let cellsAlive = this.getCellsAlive();
 
       cellsAlive.forEach((cell) => {
         this.getNumberNeighborsCell(cell);
       });
 
-      let cellulesAlive = this.checkCellules();
+      console.log(this.gameBoard);
+
+     let cellulesAlive = this.checkCellules();
 
       this.updateFront(cellulesAlive);
-      //let ts2 = performance.now()
+      let ts2 = performance.now()
+      this.moyenneTime += (ts2-ts1)
       //console.log('play : '+(ts2-ts1));
     },
     getCellsAlive() {
@@ -134,6 +140,17 @@ export default {
       const index = col + row * this.nbCols;
       const maxX = this.nbCols - 1;
       const maxY = this.nbRows - 1;
+
+      this.matricePosition = [
+        -1, // left
+        +1, // right
+        -this.nbCols, // Top
+        -(this.nbCols + 1), // TopLeft
+        -(this.nbCols - 1), // TopRight
+        +this.nbCols, // bottom
+        +(this.nbCols - 1), // BottomLeft
+        +(this.nbCols + 1), // BottomRight
+      ];
 
       if (col > 0) this.gameBoard[index + this.matricePosition[0]].nbVoisins++;
       if (col < maxX)

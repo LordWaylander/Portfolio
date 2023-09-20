@@ -17,7 +17,7 @@
 </template>
 <style lang="scss" scoped>
 .menu {
-  background-color: var(--color-background-soft);
+  background-color: var(--grey);
   width: 75vw;
   height: 50vh;
   flex-direction: column;
@@ -52,7 +52,7 @@
       width: 100%;
       padding: 1em;
       border-radius: 1em;
-      color: var(--color-text);
+      color: var(--primary-text);
       font-size: 1.25em;
       text-decoration: none;
       cursor: pointer;

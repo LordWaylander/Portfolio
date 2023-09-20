@@ -43,7 +43,7 @@ export default {
       }
       figcaption {
         text-align: center;
-        color: var(--color-text);
+        color: var(--primary-text);
       }
     }
   }
