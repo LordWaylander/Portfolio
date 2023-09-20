@@ -51,7 +51,6 @@ export default {
       cellSizeInPx: 10,
       factorPopulation: 1.2,
       gameBoard: new Array(),
-      nextBoard: new Array(),
       nbVoisins: new Array(),
     };
   },
@@ -59,7 +58,7 @@ export default {
     this.init()
   },
   mounted() {
-    this.start()
+    this.start() //~140ms
   },
   methods: {
     init() {
@@ -75,16 +74,13 @@ export default {
     },
     createInitialCells() {
       this.gameBoard = new Array(this.nbRows)
-      this.nextBoard = new Array(this.nbRows)
       this.nbVoisins = new Array(this.nbRows)
 
       for (let i = 0; i < this.nbRows; i++) {
 
         this.gameBoard[i] = new Array(this.nbCols)
-        this.nextBoard[i] = new Array(this.nbCols)
         this.nbVoisins[i] = new Array(this.nbCols)
         this.nbVoisins[i].fill(0)
-        this.nextBoard[i].fill(0)
 
         for (let j = 0; j < this.nbCols; j++) {
           Math.floor(Math.random() * this.factorPopulation) != 0
@@ -147,7 +143,7 @@ export default {
       }
     },
     pause() {
-      console.log('moyenne : '+this.moyenneTime/this.nbGeneration);
+      console.log('temps moyen d\'excecution : '+this.moyenneTime/this.nbGeneration);
       this.clearnIntervId();
     },
     restart() {

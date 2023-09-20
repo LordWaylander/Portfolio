@@ -32,7 +32,7 @@ export default {
     startApp: {
       handler(value) {
         if (value) {
-          this.start();
+          this.start(); //~120ms
         }
       },
     },
@@ -70,7 +70,7 @@ export default {
     this.init();
   },
   mounted() {
-    //this.start();
+    this.start();
   },
   beforeUnmount() {
     this.clearnIntervId();
@@ -78,13 +78,16 @@ export default {
   },
   methods: {
     init() {
+      let ts1 = performance.now()
       this.setVariables();
       this.createInitialCells();
+      let ts2 = performance.now()
+      console.log('init : '+(ts2-ts1));
     },
     setVariables() {
       this.gameBoard = new Array();
-      this.nbCols = 3//Math.floor(window.innerWidth / this.cellSizeInPx);
-      this.nbRows = 3//Math.floor(window.innerHeight / this.cellSizeInPx);
+      this.nbCols = Math.floor(window.innerWidth / this.cellSizeInPx);
+      this.nbRows = Math.floor(window.innerHeight / this.cellSizeInPx);
       this.matricePosition = [
         -1, // left
         +1, // right
@@ -104,7 +107,7 @@ export default {
             col: j,
             isAlive:
               Math.floor(Math.random() * this.factorPopulation) != 0
-                ? false
+                ? true
                 : false,
             nbVoisins: 0,
           };
@@ -120,9 +123,7 @@ export default {
         this.getNumberNeighborsCell(cell);
       });
 
-      console.log(this.gameBoard);
-
-     let cellulesAlive = this.checkCellules();
+      let cellulesAlive = this.checkCellules();
 
       this.updateFront(cellulesAlive);
       let ts2 = performance.now()
@@ -179,6 +180,12 @@ export default {
         }
       });
       return cellulesAlive;
+      /*for (let i = 0; i < this.gameBoard.length; i++) {
+        let isAlive = this.gameBoard[i].isAlive === true;
+          const needLive = (isAlive &&(this.gameBoard[i].nbVoisins === 2 || this.gameBoard[i].nbVoisins === 3)) || (!isAlive && this.gameBoard[i].nbVoisins === 3);
+          this.gameBoard[i].isAlive = needLive ? true : false;
+          this.gameBoard[i].nbVoisins = 0
+      }*/
     },
     updateFront(cellulesAlive) {
       for (const cell of this.gameBoard) {
