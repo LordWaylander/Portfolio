@@ -100,6 +100,7 @@ export default {
       ];
     },
     createInitialCells() {
+      //t'as inversé nbRows et nbCols je crois
       for (let i = 0; i < this.nbRows; i++) {
         for (let j = 0; j < this.nbCols; j++) {
           const cellsProperties = {
