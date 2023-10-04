@@ -1,5 +1,5 @@
 <template lang="">
-  <div class="cover">
+  <div class="cover realisations">
     <h1>Réalisations</h1>
     <div class="grid">
       <Card :item="item" v-for="item in items" />

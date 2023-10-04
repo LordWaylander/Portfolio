@@ -1,5 +1,5 @@
 <template lang="">
-    <div class="cover">
+    <div class="cover presentation">
         <div class="margin-auto center">
             <h1>Qui suis-je ?</h1>
             <div>

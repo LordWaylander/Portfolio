@@ -27,6 +27,11 @@
       font-size: 1em !important;
     }
   }
+  .exp{
+    .img {
+      width: 7em !important;
+    }
+  }
 }
 @media (max-width: 445px) {
   .title {
@@ -43,6 +48,11 @@
   }
   figure {
     height: 80% !important;
+  }
+  .exp{
+    .img {
+      width: 5em !important;
+    }
   }
 }
 

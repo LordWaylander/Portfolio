@@ -39,7 +39,10 @@ export default {
     pauseApp: {
       handler(value) {
         if (value) {
-          console.log('temps moyen d\'excecution : '+this.moyenneTime/this.nbGeneration);
+          console.log(
+            "temps moyen d'excecution : " +
+              this.moyenneTime / this.nbGeneration,
+          );
           this.pause();
         }
       },
@@ -79,11 +82,13 @@ export default {
   },
   methods: {
     init() {
-      let ts1 = performance.now()
+      let ts1 = performance.now();
       this.setVariables();
       this.createInitialCells();
-      let ts2 = performance.now()
-      console.log('init : '+(ts2-ts1));
+      console.log("rows : " + this.nbRows);
+      console.log("cols : " + this.nbCols);
+      let ts2 = performance.now();
+      console.log("init : " + (ts2 - ts1));
     },
     setVariables() {
       this.nbCols = Math.floor(window.innerWidth / this.cellSizeInPx);
@@ -113,22 +118,22 @@ export default {
             nbVoisins: 0,
           };
           this.gameBoard.push(cellsProperties);
-          cellsProperties.isAlive ? this.cellsAlives.push(cellsProperties) : ''
+          cellsProperties.isAlive ? this.cellsAlives.push(cellsProperties) : "";
         }
       }
     },
     play() {
-      let ts1 = performance.now()
+      let ts1 = performance.now();
 
       this.cellsAlives.forEach((cell) => {
         this.getNumberNeighborsCell(cell);
       });
-      this.cellsAlives = []
+      this.cellsAlives = [];
       this.checkCellules();
       this.updateFront();
-      
-      let ts2 = performance.now()
-      this.moyenneTime += (ts2-ts1)
+
+      let ts2 = performance.now();
+      this.moyenneTime += ts2 - ts1;
       //console.log('play : '+(ts2-ts1));
     },
     getNumberNeighborsCell(cellule) {
@@ -154,9 +159,12 @@ export default {
         this.gameBoard[index + this.matricePosition[7]].nbVoisins++;
     },
     checkCellules() {
-      this.gameBoard.forEach(cellule => {
+      this.gameBoard.forEach((cellule) => {
         let isAlive = cellule.isAlive === true;
-        if ((!isAlive && cellule.nbVoisins == 3) ||(isAlive && (cellule.nbVoisins == 2 || cellule.nbVoisins == 3))) {
+        if (
+          (!isAlive && cellule.nbVoisins == 3) ||
+          (isAlive && (cellule.nbVoisins == 2 || cellule.nbVoisins == 3))
+        ) {
           this.cellsAlives.push(cellule);
         }
       });
@@ -175,7 +183,7 @@ export default {
     },
     start() {
       if (!this.nIntervId) {
-        this.nIntervId = setInterval(this.play, 250);
+        this.nIntervId = setInterval(this.play, 150);
       }
     },
     pause() {

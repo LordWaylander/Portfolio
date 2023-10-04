@@ -12,7 +12,7 @@
     <section class="three-4page">
       <SavoirFaire />
     </section>
-    <footer class="cover footer">
+    <footer class="footer">
       <p>2023 François CAIZES</p>
     </footer>
   </main>
@@ -21,5 +21,6 @@
 section {
   display: flex;
   align-items: center;
+  height: max-content;
 }
 </style>
