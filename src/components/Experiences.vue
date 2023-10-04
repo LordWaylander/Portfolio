@@ -3,7 +3,7 @@
     <h1>Expériences</h1>
     <v-timeline :density="density" line-color="grey" side="end" align="start">
       <v-timeline-item
-        dot-color="grey"
+        dot-color="#A9A9A9"
         min-height="10em"
         width="100%"
         v-for="experience in experiences"
