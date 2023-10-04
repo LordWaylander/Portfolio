@@ -2,7 +2,7 @@
   <main class="fullPage center">
     <div class="center menu">
       <div>
-        <h1 class="title">Waylander</h1>
+        <h1 class="title">François Caizes</h1>
       </div>
       <span></span>
       <div>

@@ -2,25 +2,25 @@
   <div class="cover exp">
     <h1>Expériences</h1>
     <v-timeline :density="density" line-color="grey" side="end" align="start">
-      <v-timeline-item 
-      dot-color="grey" 
-      min-height="10em"
-      width="100%"
-      v-for="experience in experiences"
+      <v-timeline-item
+        dot-color="grey"
+        min-height="10em"
+        width="100%"
+        v-for="experience in experiences"
       >
-    <template v-slot:opposite>
-      <div class="img">
-        <img :src="experience.image" alt="logo du lieu du travail" />
-      </div>
-    </template>
-      <h3 class="text-h6">{{ experience.lieu }}</h3>
-      <p>
-        {{ experience.job }}
-      </p>
-      <p>
-        {{ experience.date }}
-      </p>
-  </v-timeline-item>
+        <template v-slot:opposite>
+          <div class="img">
+            <img :src="experience.image" alt="logo du lieu du travail" />
+          </div>
+        </template>
+        <h3 class="text-h6">{{ experience.lieu }}</h3>
+        <p>
+          {{ experience.job }}
+        </p>
+        <p>
+          {{ experience.date }}
+        </p>
+      </v-timeline-item>
     </v-timeline>
   </div>
 </template>
@@ -28,7 +28,7 @@
 export default {
   data() {
     return {
-      density: 'default',
+      density: "default",
       experiences: [
         {
           lieu: "Bibliothèque Municipale de Lyon",
@@ -57,19 +57,19 @@ export default {
       ],
     };
   },
-  created(){
-    window.addEventListener('resize', this.updateDenseTimeline);
-    this.updateDenseTimeline()
+  created() {
+    window.addEventListener("resize", this.updateDenseTimeline);
+    this.updateDenseTimeline();
   },
   methods: {
     updateDenseTimeline() {
       if (window.innerWidth < 445) {
-        this.density = 'compact';
+        this.density = "compact";
       } else {
-        this.density = 'default';
+        this.density = "default";
       }
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss">
