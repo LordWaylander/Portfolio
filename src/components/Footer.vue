@@ -36,7 +36,7 @@ div {
   a {
     margin: 0 1em 1em 0;
     img {
-      width: 5%;
+      width: 2em;
     }
   }
 }
