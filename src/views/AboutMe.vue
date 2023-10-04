@@ -12,9 +12,9 @@
     <section class="three-4page">
       <SavoirFaire />
     </section>
-    <footer class="footer">
-      <p>2023 François CAIZES</p>
-    </footer>
+    <div>
+      <Footer />
+    </div>
   </main>
 </template>
 <style lang="scss" scoped>

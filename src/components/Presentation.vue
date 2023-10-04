@@ -10,7 +10,7 @@
         <p>
           J'ai fais 7 ans d'armée dont 1 an de reconversion professionnelle.<br />
           L'armée m'a apporté beaucoup de savoir-être, notamment au niveau de la
-          rigueur et du sérieux à avoir dans l'excécution d'un travail
+          rigueur et du sérieux à avoir dans l'excécution du travail
         </p>
         <p>
           A la suite de ceci, j'ai entamé une reconversion professionnelle dans
@@ -23,8 +23,8 @@
           développeur full-stack ou la je me suis épanoui, tant par le
           renforcement de mes connaissances, l'apprentissage constant et la
           réflexion à apporter à chaque développement.En plus du développement
-          j'ai pu apprendre, en partie, comment déployer une application en
-          production et savoir configurer un serveur linux.
+          j'ai pu apprendre, comment déployer une application en production et
+          savoir configurer un serveur linux.
         </p>
       </div>
     </div>

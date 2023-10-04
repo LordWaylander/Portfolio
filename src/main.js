@@ -13,7 +13,8 @@ import Presentation from "./components/Presentation.vue";
 import Realisations from "./components/Realisations.vue";
 import Experiences from "./components/Experiences.vue";
 import SavoirFaire from "./components/SavoirFaire.vue";
-import Card from "./components/cards/Card.vue";
+import Footer from "./components/Footer.vue";
+import Card from "./components/Card.vue";
 
 const vuetify = createVuetify({
   components,
@@ -30,5 +31,6 @@ app.component("Realisations", Realisations);
 app.component("Experiences", Experiences);
 app.component("SavoirFaire", SavoirFaire);
 app.component("Card", Card);
+app.component("Footer", Footer);
 
 app.mount("#app");
