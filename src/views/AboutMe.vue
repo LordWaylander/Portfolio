@@ -18,9 +18,9 @@
   </main>
 </template>
 <style lang="scss" scoped>
-section {
+/*section {
   display: flex;
   align-items: center;
   height: max-content;
-}
+}*/
 </style>

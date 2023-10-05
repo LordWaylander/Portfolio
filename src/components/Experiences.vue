@@ -1,5 +1,5 @@
 <template lang="">
-  <div class="cover exp">
+  <div class="cover experience">
     <h1>Expériences</h1>
     <v-timeline :density="density" line-color="grey" side="end" align="start">
       <v-timeline-item
@@ -73,10 +73,10 @@ export default {
 };
 </script>
 <style lang="scss">
-.img {
+/*.img {
   width: 10em;
   img {
     width: 100%;
   }
-}
+}*/
 </style>

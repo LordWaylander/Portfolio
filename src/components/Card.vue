@@ -21,7 +21,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.card {
+/*.card {
   width: 100%;
   box-shadow: 0.25em 0.25em 0.25em 0.25em gray;
   border-radius: 1em;
@@ -43,5 +43,5 @@ export default {
       }
     }
   }
-}
+}*/
 </style>

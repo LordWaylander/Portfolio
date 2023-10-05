@@ -1,6 +1,6 @@
 <template lang="">
-  <div class="cover presentation">
-    <div class="margin-auto center">
+  <div class="cover ">
+    <div class="margin-auto center presentation">
       <h1>Qui suis-je ?</h1>
       <div>
         <p>
@@ -28,13 +28,24 @@
         </p>
       </div>
     </div>
+    <SocialsLinks class="stuckOnRight"/>
   </div>
 </template>
 <style lang="scss" scoped>
-.margin-auto {
+.stuckOnRight{
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  right: 0;
+  margin-right: 1em;
+}
+.presentation {
+  margin-bottom: 2em;
+}
+/*.margin-auto {
   margin: 0 25% 0 25%;
 }
 .center {
   flex-direction: column;
-}
+}*/
 </style>

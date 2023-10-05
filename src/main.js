@@ -15,6 +15,7 @@ import Experiences from "./components/Experiences.vue";
 import SavoirFaire from "./components/SavoirFaire.vue";
 import Footer from "./components/Footer.vue";
 import Card from "./components/Card.vue";
+import SocialsLinks from "./components/SocialsLinks.vue";
 
 const vuetify = createVuetify({
   components,
@@ -32,5 +33,6 @@ app.component("Experiences", Experiences);
 app.component("SavoirFaire", SavoirFaire);
 app.component("Card", Card);
 app.component("Footer", Footer);
+app.component("SocialsLinks", SocialsLinks);
 
 app.mount("#app");

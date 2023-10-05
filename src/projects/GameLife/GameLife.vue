@@ -1,5 +1,5 @@
 <template lang="">
-  <div>
+  <div class="gameLife">
     <div id="buttonsGroup">
       <div>
         <label for="generation">#</label>
@@ -65,7 +65,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-#buttonsGroup {
+/*#buttonsGroup {
   position: absolute;
   top: 0;
   z-index: 20;
@@ -99,5 +99,5 @@ export default {
       background-color: #b9bec6 !important;
     }
   }
-}
+}*/
 </style>

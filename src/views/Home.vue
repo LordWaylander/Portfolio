@@ -16,7 +16,7 @@
   </main>
 </template>
 <style lang="scss" scoped>
-.menu {
+/*.menu {
   background-color: var(--grey);
   width: 75vw;
   min-height: 50vh;
@@ -60,5 +60,5 @@
       cursor: pointer;
     }
   }
-}
+}*/
 </style>
