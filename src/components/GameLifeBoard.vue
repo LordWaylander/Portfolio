@@ -1,18 +1,6 @@
 <template lang="">
   <table id="gameBoard">
-    <tbody>
-      <tr v-for="row in nbRows">
-        <td
-          v-for="col in nbCols"
-          :class="[
-            gameBoard[col - 1 + (row - 1) * nbCols].isAlive ? 'isAlive' : '',
-          ]"
-          :data-row="row - 1"
-          :data-col="col - 1"
-          @click="defineAlive($event)"
-        ></td>
-      </tr>
-    </tbody>
+    <tbody id="gameLife"></tbody>
   </table>
 </template>
 <script>
@@ -58,22 +46,22 @@ export default {
   },
   data() {
     return {
-      moyenneTime: 0,
-      nbGeneration: 0,
-      nbCols: 0,
       nbRows: 0,
-      cellSizeInPx: 10,
+      nbCols: 0,
+      pixelSize: 10,
+      nbGeneration: 0,
+      moyenneTime: 0,
       factorPopulation: 1.2,
-      gameBoard: new Array(),
-      cellsAlives: new Array(),
-      matricePosition: new Array(),
       nIntervId: null,
+      game: {
+        etatDom: new Array(),
+        nbVoisins: new Array(),
+      },
     };
   },
-  created() {
-    this.init();
-  },
+  created() {},
   mounted() {
+    this.init();
     this.start();
   },
   beforeUnmount() {
@@ -82,107 +70,142 @@ export default {
   },
   methods: {
     init() {
+        let table = document.getElementById('gameLife')
+        table.addEventListener('click', (e) => {
+            e.target.classList.toggle('isAlive');
+        });
+
       let ts1 = performance.now();
       this.setVariables();
-      this.createInitialCells();
-      console.log("rows : " + this.nbRows);
-      console.log("cols : " + this.nbCols);
+      this.createTable();
       let ts2 = performance.now();
       console.log("init : " + (ts2 - ts1));
+      console.log("rows : " + this.nbRows);
+      console.log("cols : " + this.nbCols);
     },
     setVariables() {
-      this.nbCols = Math.floor(window.innerWidth / this.cellSizeInPx);
-      this.nbRows = Math.floor(window.innerHeight / this.cellSizeInPx);
-      this.matricePosition = [
-        -1, // left
-        +1, // right
-        -this.nbCols, // Top
-        -(this.nbCols + 1), // TopLeft
-        -(this.nbCols - 1), // TopRight
-        +this.nbCols, // bottom
-        +(this.nbCols - 1), // BottomLeft
-        +(this.nbCols + 1), // BottomRight
-      ];
+      this.nbRows = Math.floor(window.innerHeight / this.pixelSize);
+      this.nbCols = Math.floor(window.innerWidth / this.pixelSize);
     },
-    createInitialCells() {
+
+    createTable() {
+      let tbody = document.querySelector("tbody");
+      let tableString = "";
+      this.game.etatDom = new Array(this.nbRows);
+      this.game.nbVoisins = new Array(this.nbRows);
       for (let i = 0; i < this.nbRows; i++) {
+        this.game.etatDom[i] = new Array(this.nbCols);
+        this.game.nbVoisins[i] = new Array(this.nbCols).fill(0);
+        tableString += "<tr>";
         for (let j = 0; j < this.nbCols; j++) {
-          const cellsProperties = {
-            row: i,
-            col: j,
-            isAlive:
-              Math.floor(Math.random() * this.factorPopulation) != 0
-                ? true
-                : false,
-            nbVoisins: 0,
-          };
-          this.gameBoard.push(cellsProperties);
-          cellsProperties.isAlive ? this.cellsAlives.push(cellsProperties) : "";
+          const isAlive = Math.floor(Math.random() * this.factorPopulation);
+          tableString += `<td class="${
+            isAlive ? "isAlive" : ""
+          }" data-row="${i}" data-col="${j}">`;
         }
+        tableString += "</tr>";
       }
+      tbody.innerHTML = tableString;
+
+      const allCells = Array.from(document.getElementsByTagName("td"));
+      allCells.forEach((cell) => {
+        this.game.etatDom[cell.dataset.row][cell.dataset.col] = cell;
+      });
     },
     play() {
       let ts1 = performance.now();
 
-      this.cellsAlives.forEach((cell) => {
-        this.getNumberNeighborsCell(cell);
+      const cellsAlives = Array.from(
+        document.getElementsByClassName("isAlive"),
+      );
+      cellsAlives.forEach((cell) => {
+        const row = parseInt(cell.dataset.row);
+        const col = parseInt(cell.dataset.col);
+        this.getNumberNeighborsCell(row, col);
       });
-      this.cellsAlives = [];
-      this.checkCellules();
-      this.updateFront();
 
+      const cellWhoWillBeAlives = this.checkCellules();
+      for (let i = 0; i < this.game.nbVoisins.length; i++) {
+        this.game.nbVoisins[i].fill(0);
+      }
+      this.updateFront(cellWhoWillBeAlives);
       let ts2 = performance.now();
       this.moyenneTime += ts2 - ts1;
       //console.log('play : '+(ts2-ts1));
     },
-    getNumberNeighborsCell(cellule) {
-      const row = cellule.row;
-      const col = cellule.col;
-      const index = col + row * this.nbCols;
-      const maxX = this.nbCols - 1;
-      const maxY = this.nbRows - 1;
 
-      if (col > 0) this.gameBoard[index + this.matricePosition[0]].nbVoisins++;
-      if (col < maxX)
-        this.gameBoard[index + this.matricePosition[1]].nbVoisins++;
-      if (row > 0) this.gameBoard[index + this.matricePosition[2]].nbVoisins++;
-      if (row > 0 && col > 0)
-        this.gameBoard[index + this.matricePosition[3]].nbVoisins++;
-      if (row > 0 && col < maxX)
-        this.gameBoard[index + this.matricePosition[4]].nbVoisins++;
-      if (row < maxY)
-        this.gameBoard[index + this.matricePosition[5]].nbVoisins++;
-      if (row < maxY && col > 0)
-        this.gameBoard[index + this.matricePosition[6]].nbVoisins++;
-      if (row < maxY && col < maxX)
-        this.gameBoard[index + this.matricePosition[7]].nbVoisins++;
-    },
-    checkCellules() {
-      this.gameBoard.forEach((cellule) => {
-        let isAlive = cellule.isAlive === true;
-        if (
-          (!isAlive && cellule.nbVoisins == 3) ||
-          (isAlive && (cellule.nbVoisins == 2 || cellule.nbVoisins == 3))
-        ) {
-          this.cellsAlives.push(cellule);
+    getNumberNeighborsCell(row, col) {
+      /**
+       * Pour chaque cell vivantes, incrémente ses voisines de +1
+       */
+      // Traitement de la ligne précédente
+      if (row - 1 >= 0) {
+        if (col - 1 >= 0) {
+          this.game.nbVoisins[row - 1][col - 1]++;
         }
-      });
+        if (col + 1 < this.nbCols) {
+          this.game.nbVoisins[row - 1][col + 1]++;
+        }
+        this.game.nbVoisins[row - 1][col]++;
+      }
+      // Traitement de la ligne en cours
+      if (col - 1 >= 0) {
+        this.game.nbVoisins[row][col - 1]++;
+      }
+      if (col + 1 < this.nbCols) {
+        this.game.nbVoisins[row][col + 1]++;
+      }
+      // Traitement de la ligne suivante
+      if (row + 1 < this.nbRows) {
+        if (col - 1 >= 0) {
+          this.game.nbVoisins[row + 1][col - 1]++;
+        }
+        if (col + 1 < this.nbCols) {
+          this.game.nbVoisins[row + 1][col + 1]++;
+        }
+        this.game.nbVoisins[row + 1][col]++;
+      }
     },
-    updateFront(cellulesAlive) {
-      for (const cell of this.gameBoard) {
-        cell.isAlive = false;
-        cell.nbVoisins = 0;
-      }
 
-      for (const cell of this.cellsAlives) {
-        this.gameBoard[cell.col + cell.row * this.nbCols].isAlive = true;
-      }
+    checkCellules() {
+      /**
+       * pour tute cell, il faut verifier si elles doivent vivre ou crever
+       */
+      let cellWhoWillBeAlives = [];
 
+      for (let i = 0; i < this.game.etatDom.length; i++) {
+        for (let j = 0; j < this.game.etatDom[i].length; j++) {
+          let isAlive = this.game.etatDom[i][j].classList.contains("isAlive");
+          if (
+            (!isAlive && this.game.nbVoisins[i][j] === 3) ||
+            (isAlive &&
+              (this.game.nbVoisins[i][j] === 2 ||
+                this.game.nbVoisins[i][j] === 3))
+          ) {
+            cellWhoWillBeAlives.push(this.game.etatDom[i][j]);
+          }
+        }
+      }
+      return cellWhoWillBeAlives;
+    },
+
+    updateFront(cellWhoWillBeAlives) {
+      const cellsAlives = Array.from(
+        document.getElementsByClassName("isAlive"),
+      );
+
+      for (let i = 0; i < cellsAlives.length; i++) {
+        cellsAlives[i].classList.remove("isAlive");
+      }
+      for (let i = 0; i < cellWhoWillBeAlives.length; i++) {
+        cellWhoWillBeAlives[i].classList.add("isAlive");
+      }
+      this.nbGeneration++;
       this.$emit("updateNbGeneration", this.nbGeneration++);
     },
     start() {
       if (!this.nIntervId) {
-        this.nIntervId = setInterval(this.play, 150);
+        this.nIntervId = setInterval(this.play, 250);
       }
     },
     pause() {
@@ -197,31 +220,9 @@ export default {
     clearnIntervId() {
       clearInterval(this.nIntervId);
       this.nIntervId = null;
-    },
-    defineAlive(e) {
-      const row = parseInt(e.target.attributes["data-row"].value);
-      const col = parseInt(e.target.attributes["data-col"].value);
-
-      if (this.gameBoard[col + row * this.nbCols].isAlive) {
-        this.gameBoard[col + row * this.nbCols].isAlive = false;
-        e.target.classList.remove("isAlive");
-      } else {
-        this.gameBoard[col + row * this.nbCols].isAlive = true;
-        e.target.classList.add("isAlive");
-      }
-    },
+    }
   },
 };
 </script>
 <style lang="scss" scoped>
-#gameBoard {
-  position: fixed;
-  width: 100vw;
-  height: 100vh;
-  tr {
-    td.isAlive {
-      background-color: #b9bec6 !important;
-    }
-  }
-}
 </style>

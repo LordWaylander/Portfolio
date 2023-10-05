@@ -56,3 +56,14 @@
   display: flex;
   justify-content: space-around;
 }
+
+#gameBoard {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  tr {
+    td.isAlive {
+      background-color: #b9bec6 !important;
+    }
+  }
+}
