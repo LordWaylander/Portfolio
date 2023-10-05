@@ -8,7 +8,7 @@ import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 
-import GameLifeBoard from "./components/GameLifeBoard.vue";
+import GameLifeBoard from "./projects/GameLife/GameLifeBoard.vue";
 import Presentation from "./components/Presentation.vue";
 import Realisations from "./components/Realisations.vue";
 import Experiences from "./components/Experiences.vue";

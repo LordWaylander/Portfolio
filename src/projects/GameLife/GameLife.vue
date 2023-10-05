@@ -1,5 +1,5 @@
 <template lang="">
-  <div id="gameLife">
+  <div>
     <div id="buttonsGroup">
       <div>
         <label for="generation">#</label>

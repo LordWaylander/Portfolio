@@ -20,7 +20,7 @@ export default {
     startApp: {
       handler(value) {
         if (value) {
-          this.start(); //~120ms
+          this.start(); //~70-80ms
         }
       },
     },
