@@ -1,6 +1,16 @@
 <template lang="">
   <table id="gameBoard">
-    <tbody id="gameLife"></tbody>
+    <tbody>
+      <tr v-for="row in nbRows">
+        <td
+          v-for="col in nbCols"
+          :class="[cells[col - 1 + (row - 1) * nbCols] != 0 ? 'isAlive' : '']"
+          :data-row="row - 1"
+          :data-col="col - 1"
+          @click="defineAlive($event)"
+        ></td>
+      </tr>
+    </tbody>
   </table>
 </template>
 <script>
@@ -20,7 +30,7 @@ export default {
     startApp: {
       handler(value) {
         if (value) {
-          this.start(); //~70-80ms
+          this.start(); //~96.2ms
         }
       },
     },
@@ -46,22 +56,24 @@ export default {
   },
   data() {
     return {
-      nbRows: 0,
-      nbCols: 0,
-      pixelSize: 10,
-      nbGeneration: 0,
       moyenneTime: 0,
+      nbGeneration: 0,
+      nbCols: 0,
+      nbRows: 0,
+      cellSizeInPx: 10,
       factorPopulation: 1.2,
+      gameBoard: new Array(),
+      nbVoisins: new Array(),
+      matricePosition: new Array(),
+      cells: new Array(),
       nIntervId: null,
-      game: {
-        etatDom: new Array(),
-        nbVoisins: new Array(),
-      },
     };
   },
-  created() {},
-  mounted() {
+  created() {
     this.init();
+  },
+  mounted() {
+    this.gameBoard = Array.from(document.getElementsByTagName("td"));
     this.start();
   },
   beforeUnmount() {
@@ -70,47 +82,30 @@ export default {
   },
   methods: {
     init() {
-        let table = document.getElementById('gameLife')
-        table.addEventListener('click', (e) => {
-            e.target.classList.toggle('isAlive');
-        });
-
       let ts1 = performance.now();
       this.setVariables();
-      this.createTable();
-      let ts2 = performance.now();
-      console.log("init : " + (ts2 - ts1));
       console.log("rows : " + this.nbRows);
       console.log("cols : " + this.nbCols);
+      let ts2 = performance.now();
+      console.log("init : " + (ts2 - ts1));
     },
     setVariables() {
-      this.nbRows = Math.floor(window.innerHeight / this.pixelSize);
-      this.nbCols = Math.floor(window.innerWidth / this.pixelSize);
-    },
-
-    createTable() {
-      let tbody = document.querySelector("tbody");
-      let tableString = "";
-      this.game.etatDom = new Array(this.nbRows);
-      this.game.nbVoisins = new Array(this.nbRows);
-      for (let i = 0; i < this.nbRows; i++) {
-        this.game.etatDom[i] = new Array(this.nbCols);
-        this.game.nbVoisins[i] = new Array(this.nbCols).fill(0);
-        tableString += "<tr>";
-        for (let j = 0; j < this.nbCols; j++) {
-          const isAlive = Math.floor(Math.random() * this.factorPopulation);
-          tableString += `<td class="${
-            isAlive ? "isAlive" : ""
-          }" data-row="${i}" data-col="${j}">`;
-        }
-        tableString += "</tr>";
+      this.nbCols = Math.floor(window.innerWidth / this.cellSizeInPx);
+      this.nbRows = Math.floor(window.innerHeight / this.cellSizeInPx);
+      this.nbVoisins = new Array(this.nbRows * this.nbCols).fill(0);
+      this.matricePosition = [
+        -1, // left
+        +1, // right
+        -this.nbCols, // Top
+        -(this.nbCols + 1), // TopLeft
+        -(this.nbCols - 1), // TopRight
+        +this.nbCols, // bottom
+        +(this.nbCols - 1), // BottomLeft
+        +(this.nbCols + 1), // BottomRight
+      ];
+      for (let i = 0; i < this.nbRows * this.nbCols; i++) {
+        this.cells.push(Math.floor(Math.random() * this.factorPopulation));
       }
-      tbody.innerHTML = tableString;
-
-      const allCells = Array.from(document.getElementsByTagName("td"));
-      allCells.forEach((cell) => {
-        this.game.etatDom[cell.dataset.row][cell.dataset.col] = cell;
-      });
     },
     play() {
       let ts1 = performance.now();
@@ -119,93 +114,68 @@ export default {
         document.getElementsByClassName("isAlive"),
       );
       cellsAlives.forEach((cell) => {
-        const row = parseInt(cell.dataset.row);
-        const col = parseInt(cell.dataset.col);
-        this.getNumberNeighborsCell(row, col);
+        this.getNumberNeighborsCell(cell);
       });
 
       const cellWhoWillBeAlives = this.checkCellules();
-      for (let i = 0; i < this.game.nbVoisins.length; i++) {
-        this.game.nbVoisins[i].fill(0);
-      }
+      this.nbVoisins.fill(0);
+
       this.updateFront(cellWhoWillBeAlives);
+
       let ts2 = performance.now();
       this.moyenneTime += ts2 - ts1;
       //console.log('play : '+(ts2-ts1));
     },
+    getNumberNeighborsCell(cellule) {
+      const row = parseInt(cellule.dataset.row);
+      const col = parseInt(cellule.dataset.col);
+      const index = col + row * this.nbCols;
+      const maxX = this.nbCols - 1;
+      const maxY = this.nbRows - 1;
 
-    getNumberNeighborsCell(row, col) {
-      /**
-       * Pour chaque cell vivantes, incrémente ses voisines de +1
-       */
-      // Traitement de la ligne précédente
-      if (row - 1 >= 0) {
-        if (col - 1 >= 0) {
-          this.game.nbVoisins[row - 1][col - 1]++;
-        }
-        if (col + 1 < this.nbCols) {
-          this.game.nbVoisins[row - 1][col + 1]++;
-        }
-        this.game.nbVoisins[row - 1][col]++;
-      }
-      // Traitement de la ligne en cours
-      if (col - 1 >= 0) {
-        this.game.nbVoisins[row][col - 1]++;
-      }
-      if (col + 1 < this.nbCols) {
-        this.game.nbVoisins[row][col + 1]++;
-      }
-      // Traitement de la ligne suivante
-      if (row + 1 < this.nbRows) {
-        if (col - 1 >= 0) {
-          this.game.nbVoisins[row + 1][col - 1]++;
-        }
-        if (col + 1 < this.nbCols) {
-          this.game.nbVoisins[row + 1][col + 1]++;
-        }
-        this.game.nbVoisins[row + 1][col]++;
-      }
+      if (col > 0) this.nbVoisins[index + this.matricePosition[0]]++;
+      if (col < maxX) this.nbVoisins[index + this.matricePosition[1]]++;
+      if (row > 0) this.nbVoisins[index + this.matricePosition[2]]++;
+      if (row > 0 && col > 0) this.nbVoisins[index + this.matricePosition[3]]++;
+      if (row > 0 && col < maxX)
+        this.nbVoisins[index + this.matricePosition[4]]++;
+      if (row < maxY) this.nbVoisins[index + this.matricePosition[5]]++;
+      if (row < maxY && col > 0)
+        this.nbVoisins[index + this.matricePosition[6]]++;
+      if (row < maxY && col < maxX)
+        this.nbVoisins[index + this.matricePosition[7]]++;
     },
-
     checkCellules() {
-      /**
-       * pour tute cell, il faut verifier si elles doivent vivre ou crever
-       */
       let cellWhoWillBeAlives = [];
 
-      for (let i = 0; i < this.game.etatDom.length; i++) {
-        for (let j = 0; j < this.game.etatDom[i].length; j++) {
-          let isAlive = this.game.etatDom[i][j].classList.contains("isAlive");
-          if (
-            (!isAlive && this.game.nbVoisins[i][j] === 3) ||
-            (isAlive &&
-              (this.game.nbVoisins[i][j] === 2 ||
-                this.game.nbVoisins[i][j] === 3))
-          ) {
-            cellWhoWillBeAlives.push(this.game.etatDom[i][j]);
-          }
+      for (let i = 0; i < this.gameBoard.length; i++) {
+        let isAlive = this.gameBoard[i].classList.contains("isAlive") === true;
+        if (
+          (!isAlive && this.nbVoisins[i] === 3) ||
+          (isAlive && (this.nbVoisins[i] === 2 || this.nbVoisins[i] === 3))
+        ) {
+          cellWhoWillBeAlives.push(this.gameBoard[i]);
         }
       }
       return cellWhoWillBeAlives;
     },
-
     updateFront(cellWhoWillBeAlives) {
       const cellsAlives = Array.from(
         document.getElementsByClassName("isAlive"),
       );
+      cellsAlives.forEach((cell) => {
+        cell.classList.remove("isAlive");
+      });
 
-      for (let i = 0; i < cellsAlives.length; i++) {
-        cellsAlives[i].classList.remove("isAlive");
-      }
-      for (let i = 0; i < cellWhoWillBeAlives.length; i++) {
-        cellWhoWillBeAlives[i].classList.add("isAlive");
-      }
-      this.nbGeneration++;
+      cellWhoWillBeAlives.forEach((cell) => {
+        cell.classList.add("isAlive");
+      });
+
       this.$emit("updateNbGeneration", this.nbGeneration++);
     },
     start() {
       if (!this.nIntervId) {
-        this.nIntervId = setInterval(this.play, 250);
+        this.nIntervId = setInterval(this.play, 150);
       }
     },
     pause() {
@@ -213,6 +183,7 @@ export default {
     },
     restart() {
       this.clearnIntervId();
+      this.cells = new Array();
       this.nbGeneration = 0;
       this.init();
       this.start();
@@ -220,9 +191,24 @@ export default {
     clearnIntervId() {
       clearInterval(this.nIntervId);
       this.nIntervId = null;
-    }
+    },
+    defineAlive(e) {
+      const row = parseInt(e.target.attributes["data-row"].value);
+      const col = parseInt(e.target.attributes["data-col"].value);
+      this.gameBoard[col + row * this.nbCols].classList.toggle("isAlive");
+    },
   },
 };
 </script>
 <style lang="scss" scoped>
+#gameBoard {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  tr {
+    td.isAlive {
+      background-color: #b9bec6 !important;
+    }
+  }
+}
 </style>
