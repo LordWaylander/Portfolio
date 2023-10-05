@@ -19,7 +19,8 @@
 .menu {
   background-color: var(--grey);
   width: 75vw;
-  height: 50vh;
+  min-height: 50vh;
+  padding: 2em 0 2em 0;
   flex-direction: column;
   border-radius: 5em;
   z-index: 10;
@@ -42,6 +43,7 @@
     width: 25%;
     position: relative;
     top: 10%;
+    margin-top: 1em;
 
     button {
       background-color: var(--grey-light);

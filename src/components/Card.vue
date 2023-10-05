@@ -31,11 +31,7 @@ export default {
     width: 100%;
     height: 100%;
     figure {
-      height: 100%;
-
       img {
-        /*width: 25em;
-                height: 15em;*/
         border-top-left-radius: 1em;
         border-top-right-radius: 1em;
         width: 100%;
