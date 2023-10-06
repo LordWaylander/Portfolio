@@ -173,7 +173,7 @@ section {
     text-decoration: none;
     display: block;
     width: 100%;
-    height: 100%;
+    height: max-content;
       img {
         border-top-left-radius: 1em;
         border-top-right-radius: 1em;
@@ -186,9 +186,6 @@ section {
       justify-content: center;
       text-align: center;
       color: var(--primary-text);
-      h3 {
-        margin-right: 0.5em;
-      }
       img {
         width: 50% !important;
       }
