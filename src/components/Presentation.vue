@@ -1,5 +1,5 @@
 <template lang="">
-  <div class="cover ">
+  <div class="cover">
     <div class="margin-auto center presentation">
       <h1>Qui suis-je ?</h1>
       <div>
@@ -28,11 +28,11 @@
         </p>
       </div>
     </div>
-    <SocialsLinks class="stuckOnRight"/>
+    <SocialsLinks class="stuckOnRight" />
   </div>
 </template>
 <style lang="scss" scoped>
-.stuckOnRight{
+.stuckOnRight {
   position: absolute;
   display: flex;
   flex-direction: column;

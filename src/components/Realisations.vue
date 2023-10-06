@@ -22,6 +22,11 @@ export default {
             "https://www.bm-lyon.fr/les-rendez-vous-des-bibliotheques-municipales-de-lyon/#/",
           image: "/img/agenda_background.jpg",
         },
+        {
+          name: "Fourmi de Langton",
+          route: "/langton",
+          image: "/img/langton.png",
+        },
       ],
     };
   },
