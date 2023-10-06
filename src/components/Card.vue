@@ -1,13 +1,15 @@
 <template lang="">
   <div class="card">
-    <a :href="item.route" target="_blank">
+    
       <figure>
-        <img :src="item.image" alt="image de la réalisation" />
+        <a :href="item.route" target="_blank">
+          <img :src="item.image" alt="image de la réalisation" />
+        </a>
         <figcaption>
-          <h3>{{ item.name }}</h3>
+          <h3>{{ item.name }} </h3><span><a v-if="item.info" :href="item.info" target="_blank"><img src="/img/question.png" alt="kézako" class="questionImg"/></a></span>
         </figcaption>
       </figure>
-    </a>
+    
   </div>
 </template>
 <script>

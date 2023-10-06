@@ -15,6 +15,7 @@ export default {
           name: "Jeu de la vie",
           route: "/gameLife",
           image: "/img/gameLife_background.jpg",
+          info : "https://youtu.be/S-W0NX97DB0?si=YACFxyMjO-j0DSyE"
         },
         {
           name: "Agenda de La Bibliothèque de Lyon",
@@ -26,6 +27,7 @@ export default {
           name: "Fourmi de Langton",
           route: "/langton",
           image: "/img/langton.png",
+          info: "https://youtu.be/qZRYGxF6D3w?si=18-VLCSTtvV_WuNS"
         },
       ],
     };
