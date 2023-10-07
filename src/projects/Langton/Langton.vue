@@ -80,12 +80,14 @@ export default {
         +this.nbCols, // bottom
       ];
       this.positionFourmi = Math.floor(
-        this.nbCols / 2 + (this.nbRows / 2) * this.nbCols,
+        this.nbCols + (this.nbRows / 2) * this.nbCols,
       );
       // définition d'une direction par défault
       this.previousMouvement = this.matricePosition[2];
       for (let i = 0; i < this.nbRows * this.nbCols; i++) {
-        this.cells.push(Math.floor(Math.random() * this.factorPopulation) != 0 ? true : false);
+        this.cells.push(
+          Math.floor(Math.random() * this.factorPopulation) != 0 ? true : false,
+        );
       }
     },
     play() {
