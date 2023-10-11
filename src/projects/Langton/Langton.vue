@@ -86,7 +86,8 @@ export default {
       this.previousMouvement = this.matricePosition[2];
       for (let i = 0; i < this.nbRows * this.nbCols; i++) {
         this.cells.push(
-          Math.floor(Math.random() * this.factorPopulation) != 0 ? true : false,
+          //Math.floor(Math.random() * this.factorPopulation) != 0 ? true : false,
+          false
         );
       }
     },
