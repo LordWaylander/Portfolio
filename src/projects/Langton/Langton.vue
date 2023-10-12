@@ -80,7 +80,7 @@ export default {
         +this.nbCols, // bottom
       ];
       this.positionFourmi = Math.floor(
-        this.nbCols + (this.nbRows / 2) * this.nbCols,
+        (this.nbCols/2) + (this.nbRows / 2) * this.nbCols,
       );
       // définition d'une direction par défault
       this.previousMouvement = this.matricePosition[2];
