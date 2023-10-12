@@ -16,7 +16,7 @@
       href="mailto:&#102;r&#97;n&#99;&#111;%69s%2ecai%7aes&#64;%6ca&#112;os&#116;%65%2enet"
       ><img src="/img/socialsLinks/email.png"
     /></a>
-    <a href="tel:0664885034"><img src="/img/socialsLinks/tel.svg" /></a>
+    <a href="tel:0664885034"><img src="/img/socialsLinks/tel.png" /></a>
   </div>
 </template>
 <script>
