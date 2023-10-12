@@ -22,12 +22,4 @@
 <script>
 export default {};
 </script>
-<style lang="scss" scoped>
-/*h3 {
-  color: #4bd0d0;
-}
-p {
-  padding-bottom: 1em;
-  text-align: center;
-}*/
-</style>
+<style lang="scss" scoped></style>

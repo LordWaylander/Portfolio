@@ -200,15 +200,4 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped>
-#gameBoard {
-  position: fixed;
-  width: 100vw;
-  height: 100vh;
-  tr {
-    td.isAlive {
-      background-color: #b9bec6 !important;
-    }
-  }
-}
-</style>
+<style lang="scss" scoped></style>

@@ -64,40 +64,4 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped>
-/*#buttonsGroup {
-  position: absolute;
-  top: 0;
-  z-index: 20;
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  padding: 1em;
-  input {
-    width: 25%;
-  }
-  button {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    img {
-      width: 25px;
-      height: 25px;
-    }
-  }
-}
-#gameBoard {
-  width: 100vw;
-  height: 100vh;
-  tr {
-    td {
-      span {
-        display: block;
-      }
-    }
-    td.isAlive {
-      background-color: #b9bec6 !important;
-    }
-  }
-}*/
-</style>
+<style lang="scss" scoped></style>

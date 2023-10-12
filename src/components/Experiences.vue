@@ -72,11 +72,4 @@ export default {
   },
 };
 </script>
-<style lang="scss">
-/*.img {
-  width: 10em;
-  img {
-    width: 100%;
-  }
-}*/
-</style>
+<style lang="scss"></style>

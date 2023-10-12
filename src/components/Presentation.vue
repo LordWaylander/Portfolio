@@ -42,10 +42,4 @@
 .presentation {
   margin-bottom: 2em;
 }
-/*.margin-auto {
-  margin: 0 25% 0 25%;
-}
-.center {
-  flex-direction: column;
-}*/
 </style>

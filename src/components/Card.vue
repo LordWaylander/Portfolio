@@ -24,28 +24,4 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped>
-/*.card {
-  width: 100%;
-  box-shadow: 0.25em 0.25em 0.25em 0.25em gray;
-  border-radius: 1em;
-  a {
-    text-decoration: none;
-    display: block;
-    width: 100%;
-    height: 100%;
-    figure {
-      img {
-        border-top-left-radius: 1em;
-        border-top-right-radius: 1em;
-        width: 100%;
-        height: 85%;
-      }
-      figcaption {
-        text-align: center;
-        color: var(--primary-text);
-      }
-    }
-  }
-}*/
-</style>
+<style lang="scss" scoped></style>
