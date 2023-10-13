@@ -47,7 +47,7 @@ export default {
       nbCols: 0,
       positionFourmi: 0,
       factorPopulation: 2,
-      cellSizeInPx: 10,
+      cellSizeInPx: 15,
       previousMouvement: null,
       nIntervId: null,
       cells: new Array(),
@@ -56,6 +56,19 @@ export default {
   },
   created() {
     this.init();
+  },
+  updated(){
+      const fourmi = document.getElementsByClassName('fourmi')[0]
+      
+      if(this.previousMouvement === this.matricePosition[0]){
+        fourmi.style.transform = 'rotate(0.75turn)'
+      } else if (this.previousMouvement === this.matricePosition[1]){
+        fourmi.style.transform = 'rotate(0.25turn)'
+      } else if (this.previousMouvement === this.matricePosition[2]){
+        fourmi.style.transform = 'rotate(0turn)'
+      }else if(this.previousMouvement === this.matricePosition[3]){
+        fourmi.style.transform = 'rotate(0.5turn)'
+      }
   },
   mounted() {
     this.start();
@@ -80,7 +93,7 @@ export default {
         +this.nbCols, // bottom
       ];
       this.positionFourmi = Math.floor(
-        this.nbCols / 2 + (this.nbRows / 2) * this.nbCols,
+       ( this.nbCols) + (this.nbRows / 2) * this.nbCols,
       );
       // définition d'une direction par défault
       this.previousMouvement = this.matricePosition[2];
@@ -133,7 +146,7 @@ export default {
     },
     start() {
       if (!this.nIntervId) {
-        this.nIntervId = setInterval(this.play, 2);
+        this.nIntervId = setInterval(this.play, 0);
       }
     },
     pause() {
@@ -153,4 +166,5 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+</style>
